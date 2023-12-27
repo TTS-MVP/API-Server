@@ -1,3 +1,2 @@
 #!/bin/bash
-sudo su
-git pull origin main
+sudo git pull origin main
