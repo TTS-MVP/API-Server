@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ArtistModule } from './artist/artist.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ConfigModule } from '@nestjs/config';
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
     }),
+    ArtistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
