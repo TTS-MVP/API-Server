@@ -25,6 +25,10 @@ services:
     volumes:
       - ./mysql/mysql_data:/var/lib/mysql
       - ./mysql/sqls/:/docker-entrypoint-initdb.d/
+    env_file:
+      - ./backend/.env.stage
+      - ./backend/.env.development
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
+      TZ: Asia/Seoul
