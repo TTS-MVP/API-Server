@@ -15,6 +15,10 @@ services:
     volumes:
       - /app/node_modules
       - ./backend:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - mysql
     command: npm run start:dev
   mysql:
     build: ./mysql
