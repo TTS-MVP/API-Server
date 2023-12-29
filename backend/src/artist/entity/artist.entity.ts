@@ -5,12 +5,12 @@ export class ArtistEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column('varchar', { length: 30 })
+  @Column('varchar', { length: 30, unique: true })
   name: string;
 
-  @Column('int', { name: 'likes_count', unsigned: true })
+  @Column('int', { name: 'likes_count', unsigned: true, default: 0 })
   likesCount: number;
 
-  @Column('text', { name: 'thumbnail_url' })
+  @Column('text', { name: 'thumbnail_url', unique: false })
   thumbnailUrl: string;
 }
