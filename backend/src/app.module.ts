@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ArtistModule } from './artist/artist.module';
+import { VoteModule } from './vote/vote.module';
 
 @Module({
   imports: [
@@ -17,10 +18,11 @@ import { ArtistModule } from './artist/artist.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: ['dist/**/*.entity{.ts,.js}'],
+      entities: ['dist/**/*.entity{.ts,.js}', 'dist/**/*.view{.ts,.js}'],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
     }),
     ArtistModule,
+    VoteModule,
   ],
   controllers: [AppController],
   providers: [AppService],
