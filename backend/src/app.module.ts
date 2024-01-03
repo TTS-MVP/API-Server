@@ -11,6 +11,8 @@ import { TypeOrmConfigService } from 'typeorm.config';
   imports: [
     ConfigModule.forRoot({
       envFilePath: process.env.NODE_ENV === 'stage' ? '.env.stage' : '.env.dev',
+      isGlobal: true,
+      cache: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
