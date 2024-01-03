@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 config({
   path: resolve(
@@ -22,9 +23,20 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity{.ts,.js}', 'dist/**/*.view{.ts,.js}'],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
-      migrations: ['dist/src/migration/*.js'],
-      migrationsTableName: 'migration',
-      migrationsRun: false,
     };
   }
 }
+
+export const AppDataSource = new DataSource({
+  type: 'mysql',
+  host: process.env.DB_HOST,
+  port: +process.env.DB_PORT,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  entities: ['dist/**/*.entity{.ts,.js}', 'dist/**/*.view{.ts,.js}'],
+  synchronize: false,
+  migrations: ['dist/src/migration/*.js'],
+  migrationsTableName: 'migration',
+  migrationsRun: false,
+});
