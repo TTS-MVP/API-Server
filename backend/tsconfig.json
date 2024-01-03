@@ -31,5 +31,5 @@
     // files to track  work from these directories
     "excludeDirectories": ["**/node_modules", "dist"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*"]
 }
