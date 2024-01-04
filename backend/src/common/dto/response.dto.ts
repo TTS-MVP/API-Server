@@ -10,10 +10,10 @@ export class ResponseDto<T = any> {
   @ApiProperty({ example: 'Success', description: '응답 메시지' })
   message: string;
 
-  @ApiProperty({ description: '실제 데이터' })
-  data: T;
+  @ApiProperty({ description: '실제 데이터', required: false })
+  data?: T;
 
-  constructor(success: boolean, statusCode: number, message: string, data: T) {
+  constructor(success: boolean, statusCode: number, message: string, data?: T) {
     this.success = success;
     this.statusCode = statusCode;
     this.message = message;

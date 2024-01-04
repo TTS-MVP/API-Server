@@ -1,23 +1,23 @@
 import { ViewEntity, ViewColumn } from 'typeorm';
-import { View } from 'typeorm/schema-builder/view/View';
 
 @ViewEntity({
   expression: `
     SELECT
-      artist_id AS id,
-      name,
-      thumbnail_url AS thumbnailUrl,
-      SUM(vote_count) AS voteCount
+      artist.id AS id,
+      artist.name,
+      artist.thumbnail_url AS thumbnailUrl,
+      COALESCE(SUM(vote.vote_count), 0) AS voteCount
     FROM
-      vote
-    LEFT JOIN 
       artist
+    LEFT JOIN 
+      vote
     ON 
       artist.id = vote.artist_id
     GROUP BY
-      artist_id
+      artist.id
     ORDER BY
-      voteCount DESC
+      voteCount DESC,
+      artist.name ASC
   `,
 })
 export class MonthlyArtistVoteView {

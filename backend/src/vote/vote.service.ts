@@ -10,6 +10,7 @@ export class VoteService {
     private monthlyArtistVoteRepository: Repository<MonthlyArtistVoteView>,
   ) {}
   async getMonthlyArtistVotes(): Promise<MonthlyArtistVoteView[]> {
+    // voteCount 순으로 내림차순 정렬, 같을 시 name 오름차순 정렬
     const ArtistVotes = await this.monthlyArtistVoteRepository.find();
 
     return ArtistVotes.map((item) => ({

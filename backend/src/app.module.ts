@@ -7,6 +7,7 @@ import { ArtistModule } from './artist/artist.module';
 import { VoteModule } from './vote/vote.module';
 import { TypeOrmConfigService } from 'typeorm.config';
 import { UserModule } from './user/user.module';
+import { AuthKakaoModule } from './auth-kakao/auth-kakao.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
     ArtistModule,
     VoteModule,
     UserModule,
+    AuthKakaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

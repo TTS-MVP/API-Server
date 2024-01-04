@@ -1,5 +1,4 @@
-import { ArtistEntity } from 'src/artist/entity/artist.entity';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user_profile', { database: 'tniverse' })
 export class UserProfileEntity {
