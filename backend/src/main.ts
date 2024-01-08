@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { GlobalExceptionFilter } from './common/filter/filter.dto';
 
 dotenv.config({
   path: path.resolve(
@@ -27,13 +28,20 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
   const config = new DocumentBuilder()
     .setTitle('트니버스 API 명세서')
     .setDescription('트니버스 API 명세서입니다.')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/docs', app, document);
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, // authorization 헤더를 자동으로 추가해줍니다.
+      defaultModelsExpandDepth: -1, // 모델을 펼치지 않습니다.
+    },
+  });
 
   await app.listen(3000);
 }

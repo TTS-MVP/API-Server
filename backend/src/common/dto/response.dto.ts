@@ -1,3 +1,4 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseDto<T = any> {
@@ -18,5 +19,18 @@ export class ResponseDto<T = any> {
     this.statusCode = statusCode;
     this.message = message;
     this.data = data;
+  }
+}
+
+export class GlobalException extends HttpException {
+  constructor(message: string, statusCode: HttpStatus) {
+    super(
+      {
+        success: false,
+        statusCode,
+        message,
+      },
+      statusCode,
+    );
   }
 }

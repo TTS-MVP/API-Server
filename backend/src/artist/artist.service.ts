@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ArtistEntity } from './entity/artist.entity';
 import { Repository } from 'typeorm';
 import { ArtistDto } from './dto/artist.dto';
+import { GlobalException } from 'src/common/dto/response.dto';
 
 @Injectable()
 export class ArtistService {
@@ -22,9 +23,7 @@ export class ArtistService {
         thumbnailUrl,
       }));
     } catch (error) {
-      // 에러 처리
-      console.error('Error while fetching artists:', error);
-      throw new Error('Failed to fetch artists');
+      throw new GlobalException('데이터베이스 오류', 500);
     }
   }
 }

@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user_info', { database: 'tniverse' })
 export class UserInfoEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
+  @PrimaryColumn({ type: 'int', unsigned: true, unique: false })
   id: number;
 
   @Column('tinyint', {

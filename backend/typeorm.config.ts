@@ -23,6 +23,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity{.ts,.js}', 'dist/**/*.view{.ts,.js}'],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
+      charset: 'utf8mb4',
     };
   }
 }
@@ -39,4 +40,5 @@ export const AppDataSource = new DataSource({
   migrations: ['dist/src/migration/*.js'],
   migrationsTableName: 'migration',
   migrationsRun: false,
+  charset: 'utf8mb4',
 });
