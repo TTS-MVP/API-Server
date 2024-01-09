@@ -22,4 +22,7 @@ export class UserInfoEntity {
     default: () => "'1'",
   })
   status: number;
+
+  @Column('text', { name: 'refresh_token' })
+  refreshToken: string;
 }

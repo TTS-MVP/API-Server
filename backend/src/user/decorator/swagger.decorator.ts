@@ -1,4 +1,5 @@
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JWTDto } from '../dto/jwt.dto';
 
 export const ApiLogin = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -10,6 +11,12 @@ export const ApiLogin = () => {
       loginType은 0: 카카오, 1: 네이버이다.  
       accessToken은 카카오 또는 네이버 소셜 로그인 토큰이다.
         `,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 트니버스 서비스 토큰을 발급받았을 때의 응답',
+      type: JWTDto,
     })(target, key, descriptor);
 
     ApiResponse({
