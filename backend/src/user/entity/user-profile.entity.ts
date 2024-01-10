@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user_profile', { database: 'tniverse' })
 export class UserProfileEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
+  @PrimaryColumn({ type: 'int', unsigned: true })
   id: number;
 
   @Column('varchar', { length: 30, name: 'nick_name' })
@@ -10,4 +10,7 @@ export class UserProfileEntity {
 
   @Column('text', { name: 'thumbnail_url' })
   thumbnailUrl: string;
+
+  @Column('int', { name: 'favorite_artist_id', unsigned: true, nullable: true })
+  favoriteArtistId?: number;
 }
