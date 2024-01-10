@@ -20,9 +20,12 @@ export class UserService {
   async register(userProfile: UserProfileEntity) {
     const isExistUser = await this.getUserInfoByUserId(userProfile.id);
     if (!isExistUser) {
-      await this.userProfileRepository.save(userProfile);
+      throw new GlobalException(
+        '존재하지 않는 사용자입니다. id값을 다시 확인해주세요.',
+        400,
+      );
     } else {
-      throw new GlobalException('이미 회원가입 된 사용자입니다.', 400);
+      await this.saveUserProfile(userProfile);
     }
   }
   async login(socialLoginType: number, kakaoAccessToken: string) {
