@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 
@@ -28,5 +28,19 @@ export class AuthService {
       },
     );
     return refreshToken;
+  }
+
+  verify(token: string) {
+    try {
+      const payload = jwt.verify(
+        token,
+        this.configService.get('JWT_SECRET'),
+      ) as jwt.JwtPayload & { user_id: number };
+      return {
+        userId: payload['user_id'],
+      };
+    } catch {
+      throw new UnauthorizedException();
+    }
   }
 }

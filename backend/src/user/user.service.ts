@@ -107,6 +107,13 @@ export class UserService {
     return userData;
   }
 
+  async getUserProfileByUserId(userId: number) {
+    const userProfileData = await this.userProfileRepository.findOne({
+      where: { id: userId },
+    }); // 카카오 사용자 아이디로 유저 조회
+    return userProfileData;
+  }
+
   async saveUserInfo(userInfo: UserInfoEntity) {
     const savedUserInfo = await this.userInfoRepository.save(userInfo);
     return savedUserInfo;

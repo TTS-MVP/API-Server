@@ -1,11 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ArtistService } from './artist.service';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiGetAllArtists } from './decorator/swagger.decorator';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { ArtistDto } from './dto/artist.dto';
+import { AuthGuard } from 'src/auth/auth-guard.service';
 
 @ApiTags('아티스트')
+@UseGuards(AuthGuard)
+@ApiBearerAuth('accessToken')
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
