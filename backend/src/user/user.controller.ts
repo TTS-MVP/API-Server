@@ -1,15 +1,25 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiTags } from '@nestjs/swagger';
-import { ApiLogin, ApiRegister } from './decorator/swagger.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiLogin,
+  ApiProfile,
+  ApiRegister,
+} from './decorator/swagger.decorator';
 import { SocialLoginTypeDto } from 'src/auth/dto/auth.dto';
 import { ResponseDto } from 'src/common/dto/response.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { userProfileDto } from './dto/profile.dto';
+import { AuthGuard } from 'src/auth/auth-guard.service';
+import { VoteService } from 'src/vote/vote.service';
+import { ApiVote } from 'src/vote/decorator/swagger.decorator';
 
 @ApiTags('유저')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly voteService: VoteService,
+  ) {}
 
   @ApiLogin()
   @Post('login')
@@ -29,8 +39,30 @@ export class UserController {
 
   @ApiRegister()
   @Post('register')
-  async register(@Body() userProfile: CreateUserDto) {
+  async register(@Body() userProfile) {
     await this.userService.register(userProfile);
     return new ResponseDto(true, 201, '회원가입 성공');
+  }
+
+  @ApiVote()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('accessToken')
+  @Get('vote')
+  async getUserVote(@Req() request) {
+    const userId = request['userInfo'].userId;
+    const data = await this.voteService.getUserVotById(userId);
+    return new ResponseDto(true, 200, '유저 투표 조회 성공', {
+      voteCount: data,
+    });
+  }
+
+  @ApiProfile()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('accessToken')
+  @Get('profile')
+  async getProfile(@Req() request) {
+    const userId = request['userInfo'].userId;
+    const data = await this.userService.getProfile(userId);
+    return new ResponseDto(true, 200, '프로필 조회 성공', data);
   }
 }

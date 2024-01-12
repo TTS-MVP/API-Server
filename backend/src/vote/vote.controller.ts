@@ -8,7 +8,6 @@ import {
 import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { MonthlyArtistVoteView } from './entity/monthly-artist-vote.view';
-import { MonthlyFanVoteView } from './entity/monthly-fan-vote.view';
 import { MonthlyFanVoteDto } from './dto/monthly-fan-vote.dto';
 
 @ApiTags('투표')

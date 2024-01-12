@@ -3,6 +3,7 @@ import {
   isExistUserLoginDto,
   isNotExistUserLoginDto,
 } from '../dto/login-user.dto';
+import { userProfileDto } from '../dto/profile.dto';
 
 export const ApiLogin = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -55,6 +56,31 @@ export const ApiRegister = () => {
     ApiResponse({
       status: 400,
       description: '이미 회원가입 된 사용자입니다.',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+export const ApiProfile = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '프로필 조회',
+      description: `프로필을 조회한다.`,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '프로필 조회 성공 시의 응답',
+      type: userProfileDto,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 404,
+      description: '존재하지 않는 사용자일 경우의 응답',
     })(target, key, descriptor);
 
     ApiResponse({

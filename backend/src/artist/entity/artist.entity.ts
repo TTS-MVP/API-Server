@@ -8,9 +8,6 @@ export class ArtistEntity {
   @Column('varchar', { length: 30 })
   name: string;
 
-  @Column('int', { name: 'likes_count', unsigned: true, default: 0 })
-  likesCount: number;
-
   @Column('text', { name: 'thumbnail_url' })
   thumbnailUrl: string;
 }

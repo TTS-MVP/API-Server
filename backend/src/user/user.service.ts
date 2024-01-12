@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { AuthKakaoService } from 'src/auth/auth-kakao/auth-kakao.service';
 import { AuthService } from 'src/auth/auth.service';
 import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
@@ -6,12 +6,17 @@ import { Repository } from 'typeorm';
 import { UserInfoEntity } from './entity/user-info.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProfileEntity } from './entity/user-profile.entity';
+import { ArtistService } from 'src/artist/artist.service';
+import { VoteService } from 'src/vote/vote.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly authKakaoService: AuthKakaoService,
     private readonly authService: AuthService,
+    private readonly artistService: ArtistService,
+    @Inject(forwardRef(() => VoteService))
+    private readonly voteService: VoteService,
     @InjectRepository(UserInfoEntity)
     private readonly userInfoRepository: Repository<UserInfoEntity>,
     @InjectRepository(UserProfileEntity)
@@ -81,6 +86,9 @@ export class UserService {
         id: userId,
         nickName: formattedSocialData.name,
         thumbnailUrl: formattedSocialData.thumbnailUrl,
+        registedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await this.saveUserInfo(userInfo);
       userProfileData = await this.saveUserProfile(userProfile);
@@ -122,5 +130,40 @@ export class UserService {
   async saveUserProfile(userProfile: UserProfileEntity) {
     const savedUserProfile = await this.userProfileRepository.save(userProfile);
     return savedUserProfile;
+  }
+
+  async getProfile(userId: number) {
+    // 유저 정보 조회
+    const userProfileData = await this.getUserProfileByUserId(userId);
+    if (!userProfileData) {
+      throw new GlobalException('존재하지 않는 사용자입니다.', 404);
+    }
+    // 데이터 전처리
+    delete userProfileData.createdAt;
+    delete userProfileData.updatedAt;
+    delete userProfileData.registedAt;
+
+    // 최애 아티스트 프로필 조회
+    const favoriteArtistId = userProfileData.favoriteArtistId;
+    const favoriteArtistProfile = await this.artistService.getArtistById(
+      favoriteArtistId,
+    );
+    if (!favoriteArtistProfile) {
+      throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
+    }
+    // 기여도 계산
+    const fanContributuin = await this.voteService.getFanContribution(
+      userId,
+      favoriteArtistId,
+    );
+
+    // 데이터 전처리
+    delete userProfileData.favoriteArtistId;
+
+    return {
+      userProfile: userProfileData,
+      favoriteArtistProfile: favoriteArtistProfile,
+      contribution: fanContributuin,
+    };
   }
 }

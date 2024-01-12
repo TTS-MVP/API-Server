@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('user_profile', { database: 'tniverse' })
 export class UserProfileEntity {
@@ -13,4 +19,13 @@ export class UserProfileEntity {
 
   @Column('int', { name: 'favorite_artist_id', unsigned: true, nullable: true })
   favoriteArtistId?: number;
+
+  @CreateDateColumn({ name: 'registed_at' })
+  registedAt: Date;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

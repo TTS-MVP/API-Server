@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
+import { GlobalException } from 'src/common/dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +40,9 @@ export class AuthService {
       return {
         userId: payload['user_id'],
       };
-    } catch {
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError)
+        throw new GlobalException('토큰이 만료되었습니다.', 401);
       throw new UnauthorizedException();
     }
   }
