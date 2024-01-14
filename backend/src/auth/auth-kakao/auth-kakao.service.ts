@@ -20,10 +20,12 @@ export class AuthKakaoService {
   }
 
   async formatKakaoUserInfo(kakaoUserInfo) {
-    const { id } = kakaoUserInfo;
-    const { name } = kakaoUserInfo.kakao_account;
-    const { nickname, thumbnail_image_url } =
-      kakaoUserInfo.kakao_account.profile;
+    const id = kakaoUserInfo.id || null;
+    const name = kakaoUserInfo.kakao_account?.name || null;
+    const profile = kakaoUserInfo.kakao_account?.profile || {};
+    const nickname = profile.nickname || null;
+    const thumbnail_image_url = profile.thumbnail_image_url || null;
+
 
     return {
       id,
