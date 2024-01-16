@@ -161,7 +161,7 @@ export class UserService {
       throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
     }
     // 기여도 계산
-    const fanContributuin = await this.voteService.getFanContribution(
+    const fanContribution = await this.voteService.getFanContribution(
       userId,
       favoriteArtistId,
     );
@@ -172,7 +172,7 @@ export class UserService {
     return {
       userProfile: userProfileData,
       favoriteArtistProfile: favoriteArtistProfile,
-      contribution: fanContributuin,
+      contribution: fanContribution,
     };
   }
 }

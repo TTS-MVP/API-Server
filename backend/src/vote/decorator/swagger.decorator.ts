@@ -1,6 +1,7 @@
 import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
 import { MonthlyArtistVoteDto } from '../dto/monthly-artist-vote.dto';
 import { MonthlyFanVoteDto } from '../dto/monthly-fan-vote.dto';
+import { VoteResultDto } from '../dto/vote.dto';
 
 export const ApiGetMonthlyFanVotes = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -44,6 +45,31 @@ export const ApiGetMonthlyArtistVotes = () => {
       status: 200,
       description: '성공적으로 월간 아티스트 투표 순위를 가져왔을 때의 응답',
       type: [MonthlyArtistVoteDto],
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+export const ApiVoteArtist = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '아티스트 투표',
+      description: '아티스트에게 투표한다.',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 투표했을 때의 응답',
+      type: VoteResultDto,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '투표권을 불러오는데 실패했을 때의 응답',
     })(target, key, descriptor);
 
     ApiResponse({

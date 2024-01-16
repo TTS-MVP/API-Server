@@ -60,7 +60,7 @@ export class UserController {
   @Get('vote')
   async getUserVote(@Req() request) {
     const userId = request['userInfo'].userId;
-    const data = await this.voteService.getUserVotById(userId);
+    const data = await this.voteService.getUserVoteById(userId);
     return new ResponseDto(true, 200, '유저 투표 조회 성공', {
       voteCount: data,
     });

@@ -9,6 +9,7 @@ import { MonthlyFanVoteView } from './entity/monthly-fan-vote.view';
 import { UserModule } from 'src/user/user.module';
 import { VoteAcquisitionHistoryEntity } from './entity/vote-acquisition-history.entity';
 import { UserVoteCountView } from './entity/vote-count.view';
+import { ArtistModule } from 'src/artist/artist.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserVoteCountView } from './entity/vote-count.view';
       UserVoteCountView,
     ]),
     AuthModule,
+    ArtistModule,
     forwardRef(() => UserModule),
   ],
   controllers: [VoteController],
