@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsInt, IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -30,11 +30,4 @@ export class CreateUserDto {
   })
   @IsInt()
   favoriteArtistId: number;
-
-  @ApiProperty({
-    example: '13',
-    description: '최애 아티스트 등록일로부터 경과한 일 수',
-  })
-  @IsInt()
-  favoriteArtistRegisteredDay?: number;
 }

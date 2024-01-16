@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
@@ -12,6 +20,7 @@ import { userProfileDto } from './dto/profile.dto';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { VoteService } from 'src/vote/vote.service';
 import { ApiVote } from 'src/vote/decorator/swagger.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiTags('유저')
 @Controller('user')
@@ -40,7 +49,7 @@ export class UserController {
 
   @ApiRegister()
   @Post('register')
-  async register(@Body() userProfile) {
+  async register(@Body() userProfile: CreateUserDto) {
     await this.userService.register(userProfile);
     return new ResponseDto(true, 201, '회원가입 성공');
   }

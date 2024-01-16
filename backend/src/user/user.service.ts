@@ -22,7 +22,7 @@ export class UserService {
     @InjectRepository(UserProfileEntity)
     private readonly userProfileRepository: Repository<UserProfileEntity>,
   ) {}
-  async register(userProfile: UserProfileEntity) {
+  async register(userProfile) {
     const isExistUser = await this.getUserInfoByUserId(userProfile.id);
     if (!isExistUser) {
       throw new GlobalException(
@@ -77,14 +77,14 @@ export class UserService {
       }
       const userInfo = {
         id: userId,
-        userName: formattedSocialData.name,
         loginType: socialLoginType,
         status: 1,
         refreshToken: refreshToken,
+        email: formattedSocialData.email,
       };
       const userProfile = {
         id: userId,
-        nickName: formattedSocialData.name,
+        nickName: formattedSocialData.nickname,
         thumbnailUrl: formattedSocialData.thumbnailUrl,
         registedAt: new Date(),
         createdAt: new Date(),
@@ -102,7 +102,16 @@ export class UserService {
     }
     return {
       isExistUser: isExistUser ? true : false,
-      userProfileData,
+      // userProfileData에서 createdAt, updatedAt, registedAt 제거
+      userProfileData: userProfileData
+        ? {
+            ...userProfileData,
+            createdAt: undefined,
+            updatedAt: undefined,
+            registedAt: undefined,
+            favoriteArtistId: undefined,
+          }
+        : undefined,
       accessToken,
       refreshToken,
     };

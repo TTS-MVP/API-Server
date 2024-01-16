@@ -20,12 +20,12 @@ export class UserProfileEntity {
   @Column('int', { name: 'favorite_artist_id', unsigned: true, nullable: true })
   favoriteArtistId?: number;
 
-  @CreateDateColumn({ name: 'registed_at' })
+  @CreateDateColumn({ name: 'registed_at', nullable: true })
   registedAt: Date;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', nullable: true })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: Date;
 }

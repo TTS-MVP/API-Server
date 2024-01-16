@@ -12,9 +12,6 @@ export class UserInfoEntity {
   })
   loginType: number;
 
-  @Column('varchar', { length: 30, name: 'user_name' })
-  userName: string;
-
   @Column('tinyint', {
     name: 'status',
     comment: '0: inactive, 1: active, 2: deleted',
@@ -25,4 +22,7 @@ export class UserInfoEntity {
 
   @Column('text', { name: 'refresh_token' })
   refreshToken: string;
+
+  @Column('text', { name: 'email', nullable: true })
+  email: string | null;
 }

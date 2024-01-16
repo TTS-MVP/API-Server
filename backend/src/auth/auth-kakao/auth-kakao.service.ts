@@ -21,14 +21,17 @@ export class AuthKakaoService {
 
   async formatKakaoUserInfo(kakaoUserInfo) {
     const { id } = kakaoUserInfo;
-    const { name } = kakaoUserInfo.kakao_account;
+    let email = null;
+    if (kakaoUserInfo.kakao_account.has_email) {
+      email = kakaoUserInfo.kakao_account.email;
+    }
     const { nickname, thumbnail_image_url } =
       kakaoUserInfo.kakao_account.profile;
 
     return {
       id,
-      name,
       nickname,
+      email,
       thumbnailUrl: thumbnail_image_url,
     };
   }
