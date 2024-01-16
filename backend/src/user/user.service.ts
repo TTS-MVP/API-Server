@@ -86,9 +86,6 @@ export class UserService {
         id: userId,
         nickName: formattedSocialData.nickname,
         thumbnailUrl: formattedSocialData.thumbnailUrl,
-        registedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
       await this.saveUserInfo(userInfo);
       userProfileData = await this.saveUserProfile(userProfile);

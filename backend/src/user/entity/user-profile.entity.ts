@@ -1,7 +1,9 @@
+import { FeedEntity } from 'src/community/entity/feed.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -21,11 +23,14 @@ export class UserProfileEntity {
   favoriteArtistId?: number;
 
   @CreateDateColumn({ name: 'registed_at', nullable: true })
-  registedAt: Date;
+  registedAt?: Date;
 
   @CreateDateColumn({ name: 'created_at', nullable: true })
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true })
-  updatedAt: Date;
+  updatedAt?: Date;
+
+  @OneToMany(() => FeedEntity, (feed) => feed.userProfile)
+  feeds?: FeedEntity[];
 }
