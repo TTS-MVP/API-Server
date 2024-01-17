@@ -1,3 +1,4 @@
+import { CommentEntity } from 'src/community/entity/comment.entity';
 import { FeedEntity } from 'src/community/entity/feed.entity';
 import {
   Column,
@@ -33,4 +34,7 @@ export class UserProfileEntity {
 
   @OneToMany(() => FeedEntity, (feed) => feed.userProfile)
   feeds?: FeedEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.userProfile)
+  comments?: CommentEntity[];
 }

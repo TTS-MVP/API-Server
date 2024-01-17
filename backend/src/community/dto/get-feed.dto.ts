@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ArtistDto } from 'src/artist/dto/artist.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CommentDto } from './comment.dto';
 
 class UserProfileDto extends OmitType(CreateUserDto, [
   'favoriteArtistId',
@@ -25,16 +26,16 @@ export class FeedDto {
   thumbnailUrl?: string | null;
 
   @ApiProperty({ default: 0, description: '피드의 좋아요 수' })
-  likeCount: number;
+  likeCount?: number;
 
   @ApiProperty({ description: '피드 작성 시간' })
-  createdAt: Date;
+  createdAt?: Date;
 
   @ApiProperty({ description: '피드 수정 시간' })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @ApiProperty({ type: UserProfileDto })
-  userProfile: UserProfileDto;
+  userProfile?: UserProfileDto;
 }
 
 export class FeedsDto {
@@ -43,4 +44,9 @@ export class FeedsDto {
 
   @ApiProperty({ type: [FeedDto] })
   feeds: FeedDto[];
+}
+
+export class DetailFeedDto extends FeedDto {
+  @ApiProperty({ type: [CommentDto] })
+  comments: CommentDto[];
 }

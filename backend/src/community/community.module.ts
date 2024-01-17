@@ -6,10 +6,11 @@ import { FeedEntity } from './entity/feed.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { ArtistModule } from 'src/artist/artist.module';
+import { CommentEntity } from './entity/comment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FeedEntity]),
+    TypeOrmModule.forFeature([FeedEntity, CommentEntity]),
     AuthModule,
     UserModule,
     ArtistModule,
