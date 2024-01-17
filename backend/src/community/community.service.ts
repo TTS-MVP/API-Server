@@ -7,6 +7,7 @@ import { GlobalException } from 'src/common/dto/response.dto';
 import { ArtistService } from 'src/artist/artist.service';
 import { DetailFeedDto, FeedsDto } from './dto/get-feed.dto';
 import { CommentEntity } from './entity/comment.entity';
+import { CreateFeedDto } from './dto/create-feed.dto';
 
 @Injectable()
 export class CommunityService {
@@ -116,5 +117,31 @@ export class CommunityService {
       .where('comment.feedId = :feedId', { feedId })
       .andWhere('comment.status = :status', { status: 1 })
       .getMany();
+  }
+
+  async createFeed(userId: number, createFeedDto: CreateFeedDto) {
+    const { content, thumbnailFile } = createFeedDto;
+
+    // 유저 정보를 가져온다.
+    const userInfo = await this.userService.getUserProfileByUserId(userId);
+    const favoriteArtistId = userInfo?.favoriteArtistId;
+    if (!favoriteArtistId)
+      throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
+
+    // TODO: 사진 multipart/form-data로 받아서 처리하기
+    if (thumbnailFile) {
+    }
+
+    try {
+      // 피드를 생성한다.
+      var feed = await this.feedRepository.save({
+        content,
+        thumbnailUrl: thumbnailFile,
+        favoriteArtistId,
+        userId,
+      });
+    } catch (error) {
+      throw new GlobalException('피드 생성에 실패했습니다.', 500);
+    }
   }
 }

@@ -26,6 +26,30 @@ export const ApiGetFeed = () => {
   };
 };
 
+export const ApiCreateFeed = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '피드 생성(아직 개발중)',
+      description: '피드를 생성한다.',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 피드를 생성했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '피드를 생성하는데 데 실패했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
 export const ApiGetFeedById = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     ApiOperation({
