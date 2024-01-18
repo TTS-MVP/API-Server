@@ -5,7 +5,9 @@ import {
   Param,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -17,6 +19,7 @@ import {
   ApiGetFeedById,
 } from './decorator/swagger.decortator';
 import { CreateFeedDto } from './dto/create-feed.dto';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
 
 @ApiTags('커뮤니티')
 @UseGuards(AuthGuard)
@@ -43,10 +46,19 @@ export class CommunityController {
 
   @ApiCreateFeed()
   @Post()
-  async createFeed(@Req() request, @Body() createFeedDto: CreateFeedDto) {
+  @UseInterceptors(FileInterceptor('imageFile'))
+  async createFeed(
+    @Req() request,
+    @Body() createFeedDto: CreateFeedDto,
+    @UploadedFile() imageFile: Express.Multer.File,
+  ) {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
-    const feed = await this.communityService.createFeed(userId, createFeedDto);
+    const feed = await this.communityService.createFeed(
+      userId,
+      createFeedDto,
+      imageFile,
+    );
     return new ResponseDto(true, 200, '피드 생성 성공', feed);
   }
 }

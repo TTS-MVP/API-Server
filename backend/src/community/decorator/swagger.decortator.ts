@@ -1,4 +1,10 @@
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { DetailFeedDto, FeedsDto } from '../dto/get-feed.dto';
 
 export const ApiGetFeed = () => {
@@ -28,8 +34,10 @@ export const ApiGetFeed = () => {
 
 export const ApiCreateFeed = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiConsumes('multipart/form-data')(target, key, descriptor);
+
     ApiOperation({
-      summary: '피드 생성(아직 개발중)',
+      summary: '피드 생성',
       description: '피드를 생성한다.',
     })(target, key, descriptor);
 

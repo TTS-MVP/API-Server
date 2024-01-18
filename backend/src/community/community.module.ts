@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { ArtistModule } from 'src/artist/artist.module';
 import { CommentEntity } from './entity/comment.entity';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CommentEntity } from './entity/comment.entity';
     AuthModule,
     UserModule,
     ArtistModule,
+    StorageModule,
   ],
   controllers: [CommunityController],
   providers: [CommunityService],

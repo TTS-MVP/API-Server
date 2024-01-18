@@ -9,6 +9,7 @@ import { TypeOrmConfigService } from 'typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CommunityModule } from './community/community.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommunityModule } from './community/community.module';
     VoteModule,
     UserModule,
     CommunityModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

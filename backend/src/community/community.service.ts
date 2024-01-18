@@ -8,6 +8,7 @@ import { ArtistService } from 'src/artist/artist.service';
 import { DetailFeedDto, FeedsDto } from './dto/get-feed.dto';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateFeedDto } from './dto/create-feed.dto';
+import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class CommunityService {
@@ -18,6 +19,7 @@ export class CommunityService {
     private readonly commentRepository: Repository<CommentEntity>,
     private readonly userService: UserService,
     private readonly artistService: ArtistService,
+    private readonly storageService: StorageService,
   ) {}
 
   private async processFeedData(feed: FeedEntity) {
@@ -119,8 +121,12 @@ export class CommunityService {
       .getMany();
   }
 
-  async createFeed(userId: number, createFeedDto: CreateFeedDto) {
-    const { content, thumbnailFile } = createFeedDto;
+  async createFeed(
+    userId: number,
+    createFeedDto: CreateFeedDto,
+    imageFile: Express.Multer.File,
+  ) {
+    const { content } = createFeedDto;
 
     // 유저 정보를 가져온다.
     const userInfo = await this.userService.getUserProfileByUserId(userId);
@@ -128,15 +134,19 @@ export class CommunityService {
     if (!favoriteArtistId)
       throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
 
-    // TODO: 사진 multipart/form-data로 받아서 처리하기
-    if (thumbnailFile) {
+    // TODO: 사진 multipart/form-data로 받아서 multer로 처리하기
+    let imageUrl;
+    if (imageFile) {
+      // 이미지를 저장한다.
+      const path = `feed/${Date.now()}_${imageFile.originalname}`;
+      imageUrl = await this.storageService.saveImage(path, imageFile);
     }
 
     try {
       // 피드를 생성한다.
       var feed = await this.feedRepository.save({
         content,
-        thumbnailUrl: thumbnailFile,
+        thumbnailUrl: imageUrl,
         favoriteArtistId,
         userId,
       });
