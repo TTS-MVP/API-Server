@@ -1,4 +1,3 @@
-import { UploadedFiles } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
@@ -10,7 +9,7 @@ export class CreateFeedDto {
   @MaxLength(500)
   content: string;
 
-  @ApiProperty({ type: 'string', format: 'binary' })
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   @IsOptional()
-  imageFile: any;
+  imageFile?: Express.Multer.File;
 }

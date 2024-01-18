@@ -50,7 +50,7 @@ export class CommunityController {
   async createFeed(
     @Req() request,
     @Body() createFeedDto: CreateFeedDto,
-    @UploadedFile() imageFile: Express.Multer.File,
+    @UploadedFile() imageFile?: Express.Multer.File,
   ) {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
