@@ -4,7 +4,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
   expression: `
     SELECT
     user_info.id AS id,
-    COALESCE(SUM(DISTINCT vote_acquisition_history.vote_count), 0) - COALESCE(SUM(DISTINCT vote.vote_count), 0) AS voteCount
+    COALESCE(SUM(DISTINCT vote_acquisition_history.vote_count), 0) - COALESCE(SUM(vote.vote_count), 0) AS voteCount
   FROM
     user_info
   LEFT JOIN
