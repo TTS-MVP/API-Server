@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   Req,
   UploadedFile,
   UseGuards,
@@ -15,8 +17,10 @@ import { AuthGuard } from 'src/auth/auth-guard.service';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import {
   ApiCreateFeed,
+  ApiDeleteFeed,
   ApiGetFeed,
   ApiGetFeedById,
+  ApiUpdateFeed,
 } from './decorator/swagger.decortator';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
@@ -60,5 +64,31 @@ export class CommunityController {
       imageFile,
     );
     return new ResponseDto(true, 200, '피드 생성 성공', feed);
+  }
+
+  @ApiUpdateFeed()
+  @Put(':feedId')
+  async updateFeed(
+    @Param('feedId') feedId: number,
+    @Req() request: Request,
+    @Body() createFeedDto: CreateFeedDto,
+  ) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const feed = await this.communityService.updateFeed(
+      feedId,
+      userId,
+      createFeedDto,
+    );
+    return new ResponseDto(true, 200, '피드 수정 성공', feed);
+  }
+
+  @ApiDeleteFeed()
+  @Delete(':feedId')
+  async deleteFeed(@Param('feedId') feedId: number, @Req() request: Request) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const feed = await this.communityService.deleteFeed(feedId, userId);
+    return new ResponseDto(true, 200, '피드 삭제 성공');
   }
 }

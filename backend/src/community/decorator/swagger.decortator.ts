@@ -6,6 +6,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { DetailFeedDto, FeedsDto } from '../dto/get-feed.dto';
+import { CreateFeedDto } from '../dto/create-feed.dto';
 
 export const ApiGetFeed = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -81,6 +82,78 @@ export const ApiGetFeedById = () => {
     ApiResponse({
       status: 400,
       description: '피드를 가져오는 데 실패했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+export const ApiUpdateFeed = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '피드 수정',
+      description: '피드를 수정한다.',
+    })(target, key, descriptor);
+
+    ApiParam({
+      name: 'feedId',
+      required: true,
+      description: '피드 고유 식별자',
+      example: 1,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 피드를 수정했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '피드를 수정하는데 실패했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 403,
+      description: '피드 수정 권한이 없을 때(작성자가 아닐 때)의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+export const ApiDeleteFeed = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '피드 삭제',
+      description: '피드를 삭제한다.',
+    })(target, key, descriptor);
+
+    ApiParam({
+      name: 'feedId',
+      required: true,
+      description: '피드 고유 식별자',
+      example: 1,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 피드를 삭제했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '피드를 삭제하는데 실패했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 403,
+      description: '피드 수정 권한이 없을 때(작성자가 아닐 때)의 응답',
     })(target, key, descriptor);
 
     ApiResponse({

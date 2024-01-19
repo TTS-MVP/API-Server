@@ -96,6 +96,8 @@ export class CommunityService {
       .andWhere('feed.status = :status', { status: 1 })
       .getOne();
 
+    if (!feed) throw new GlobalException('존재하지 않는 피드입니다.', 404);
+
     // 데이터 전처리
     this.processFeedData(feed);
 
@@ -152,6 +154,38 @@ export class CommunityService {
       });
     } catch (error) {
       throw new GlobalException('피드 생성에 실패했습니다.', 500);
+    }
+  }
+
+  async updateFeed(
+    feedId: number,
+    userId: number,
+    createFeedDto: CreateFeedDto,
+  ) {
+    const { content } = createFeedDto;
+
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      if (feed?.userProfile?.id !== userId)
+        throw new GlobalException('피드 수정 권한이 없습니다.', 403);
+      await this.feedRepository.update(feedId, { content });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('피드 수정에 실패했습니다.', 500);
+    }
+  }
+
+  async deleteFeed(feedId: number, userId: number) {
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      if (feed?.userProfile?.id !== userId)
+        throw new GlobalException('피드 수정 권한이 없습니다.', 403);
+      await this.feedRepository.update(feedId, { status: 2 });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('피드 삭제에 실패했습니다.', 500);
     }
   }
 }
