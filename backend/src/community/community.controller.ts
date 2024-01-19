@@ -68,17 +68,21 @@ export class CommunityController {
 
   @ApiUpdateFeed()
   @Put(':feedId')
+  @UseInterceptors(FileInterceptor('imageFile'))
   async updateFeed(
     @Param('feedId') feedId: number,
     @Req() request: Request,
     @Body() createFeedDto: CreateFeedDto,
+    @UploadedFile() imageFile?: Express.Multer.File,
   ) {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
+    console.log(userId);
     const feed = await this.communityService.updateFeed(
       feedId,
       userId,
       createFeedDto,
+      imageFile,
     );
     return new ResponseDto(true, 200, '피드 수정 성공', feed);
   }

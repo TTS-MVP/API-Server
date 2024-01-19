@@ -161,6 +161,7 @@ export class CommunityService {
     feedId: number,
     userId: number,
     createFeedDto: CreateFeedDto,
+    imageFile: Express.Multer.File,
   ) {
     const { content } = createFeedDto;
 
@@ -169,7 +170,19 @@ export class CommunityService {
       const feed = await this.getFeedById(feedId);
       if (feed?.userProfile?.id !== userId)
         throw new GlobalException('피드 수정 권한이 없습니다.', 403);
-      await this.feedRepository.update(feedId, { content });
+      // 사진을 수정했는지 확인한다.
+      let imageUrl;
+      if (imageFile) {
+        const path = `feed/${Date.now()}_${imageFile.originalname}`;
+        // 기존 사진을 삭제한다.
+        await this.storageService.deleteImageByUrl(feed.thumbnailUrl);
+        // 이미지를 저장한다.
+        imageUrl = await this.storageService.saveImage(path, imageFile);
+      }
+      await this.feedRepository.update(feedId, {
+        content,
+        thumbnailUrl: imageUrl || feed.thumbnailUrl,
+      });
     } catch (error) {
       if (error instanceof GlobalException) throw error;
       throw new GlobalException('피드 수정에 실패했습니다.', 500);

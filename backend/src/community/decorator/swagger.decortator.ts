@@ -93,6 +93,8 @@ export const ApiGetFeedById = () => {
 
 export const ApiUpdateFeed = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiConsumes('multipart/form-data')(target, key, descriptor);
+
     ApiOperation({
       summary: '피드 수정',
       description: '피드를 수정한다.',
