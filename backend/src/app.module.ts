@@ -7,7 +7,6 @@ import { ArtistModule } from './artist/artist.module';
 import { VoteModule } from './vote/vote.module';
 import { TypeOrmConfigService } from 'typeorm.config';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 import { CommunityModule } from './community/community.module';
 import { StorageModule } from './storage/storage.module';
 

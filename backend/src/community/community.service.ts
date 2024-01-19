@@ -5,7 +5,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { GlobalException } from 'src/common/dto/response.dto';
 import { ArtistService } from 'src/artist/artist.service';
-import { DetailFeedDto, FeedsDto } from './dto/get-feed.dto';
+import { DetailFeedDto, FeedDto, FeedsDto } from './dto/get-feed.dto';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { StorageService } from 'src/storage/storage.service';
@@ -58,7 +58,7 @@ export class CommunityService {
       .orderBy('feed.createdAt', 'DESC');
   }
 
-  private async getFeeds(favoriteArtistId: number) {
+  private async getFeeds(favoriteArtistId: number): Promise<FeedDto[]> {
     const feedQueryBuilder = await this.createFeedQueryBuilder(
       favoriteArtistId,
       1, // status: 1
