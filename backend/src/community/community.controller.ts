@@ -18,8 +18,10 @@ import { ResponseDto } from 'src/common/dto/response.dto';
 import {
   ApiCreateComment,
   ApiCreateFeed,
+  ApiCreateLike,
   ApiDeleteComment,
   ApiDeleteFeed,
+  ApiDeleteLike,
   ApiGetFeed,
   ApiGetFeedById,
   ApiUpdateComment,
@@ -149,5 +151,22 @@ export class CommunityController {
     return new ResponseDto(true, 200, '댓글 삭제 성공');
   }
 
-  // TODO: 좋아요
+  // TODO: 좋아요 하기
+  @ApiCreateLike()
+  @Post(':feedId/like')
+  async createLike(@Param('feedId') feedId: number, @Req() request: Request) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const likeCount = await this.communityService.createLike(feedId, userId);
+    return new ResponseDto(true, 200, '좋아요 성공', { likeCount });
+  }
+
+  @ApiDeleteLike()
+  @Delete(':feedId/like')
+  async deleteLike(@Param('feedId') feedId: number, @Req() request: Request) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const likeCount = await this.communityService.deleteLike(feedId, userId);
+    return new ResponseDto(true, 200, '좋아요 취소 성공', { likeCount });
+  }
 }

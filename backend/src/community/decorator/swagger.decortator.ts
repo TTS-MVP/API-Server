@@ -3,6 +3,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
+  ApiProperty,
   ApiResponse,
 } from '@nestjs/swagger';
 import { DetailFeedDto, FeedsDto } from '../dto/get-feed.dto';
@@ -259,6 +260,78 @@ export const ApiDeleteComment = () => {
     ApiResponse({
       status: 403,
       description: '댓글 삭제 권한이 없을 때(작성자가 아닐 때)의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+class LikeDto {
+  @ApiProperty({
+    example: 10,
+    description: '좋아요 개수',
+  })
+  likeCount: number;
+}
+
+export const ApiCreateLike = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '좋아요 생성',
+      description: '좋아요를 생성한다.',
+    })(target, key, descriptor);
+
+    ApiParam({
+      name: 'feedId',
+      required: true,
+      description: '피드 고유 식별자',
+      example: 1,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 좋아요를 생성했을 때의 응답',
+      type: LikeDto,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '좋아요를 생성하는데 실패했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 500,
+      description: '서버 오류 발생 시의 응답',
+    })(target, key, descriptor);
+  };
+};
+
+export const ApiDeleteLike = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '좋아요 삭제',
+      description: '좋아요를 삭제한다.',
+    })(target, key, descriptor);
+
+    ApiParam({
+      name: 'feedId',
+      required: true,
+      description: '피드 고유 식별자',
+      example: 1,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 좋아요를 삭제했을 때의 응답',
+      type: LikeDto,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '좋아요를 삭제하는데 실패했을 때의 응답',
     })(target, key, descriptor);
 
     ApiResponse({
