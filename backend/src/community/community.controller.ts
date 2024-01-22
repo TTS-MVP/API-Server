@@ -16,14 +16,18 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import {
+  ApiCreateComment,
   ApiCreateFeed,
+  ApiDeleteComment,
   ApiDeleteFeed,
   ApiGetFeed,
   ApiGetFeedById,
+  ApiUpdateComment,
   ApiUpdateFeed,
 } from './decorator/swagger.decortator';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @ApiTags('커뮤니티')
 @UseGuards(AuthGuard)
@@ -95,4 +99,55 @@ export class CommunityController {
     const feed = await this.communityService.deleteFeed(feedId, userId);
     return new ResponseDto(true, 200, '피드 삭제 성공');
   }
+
+  // TODO: 댓글
+  @ApiCreateComment()
+  @Post(':feedId/comment')
+  async createComment(
+    @Param('feedId') feedId: number,
+    @Req() request: Request,
+    @Body() createCommentDto: CreateCommentDto,
+  ) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const { content } = createCommentDto;
+    const feed = await this.communityService.createComment(
+      feedId,
+      userId,
+      content,
+    );
+    return new ResponseDto(true, 200, '댓글 생성 성공', feed);
+  }
+
+  @ApiUpdateComment()
+  @Put('/comment/:commentId')
+  async updateComment(
+    @Param('commentId') commentId: number,
+    @Req() request: Request,
+    @Body() createCommentDto: CreateCommentDto,
+  ) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const { content } = createCommentDto;
+    const feed = await this.communityService.updateComment(
+      commentId,
+      userId,
+      content,
+    );
+    return new ResponseDto(true, 200, '댓글 수정 성공', feed);
+  }
+
+  @ApiDeleteComment()
+  @Delete('/comment/:commentId')
+  async deleteComment(
+    @Param('commentId') commentId: number,
+    @Req() request: Request,
+  ) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new Error('유저 정보가 없습니다.');
+    const feed = await this.communityService.deleteComment(commentId, userId);
+    return new ResponseDto(true, 200, '댓글 삭제 성공');
+  }
+
+  // TODO: 좋아요
 }
