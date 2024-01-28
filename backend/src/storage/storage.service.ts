@@ -13,6 +13,7 @@ export class StorageFile {
 export class StorageService {
   private storage: Storage;
   private bucket: string;
+  private readonly bucketBaseUrl = 'https://storage.googleapis.com';
 
   constructor(private readonly configService: ConfigService) {
     try {
@@ -38,13 +39,22 @@ export class StorageService {
       await this.storage.bucket(this.bucket).file(path).save(imageFile.buffer, {
         contentType: imageFile.mimetype,
       });
-      return `https://storage.googleapis.com/${this.bucket}/${path}`;
+      return `${this.bucketBaseUrl}/${this.bucket}/${path}`;
     } catch (error) {
       throw new GlobalException(error.message, 500);
     }
   }
 
-  async delete(path: string) {
+  async deleteImageByPath(path: string) {
+    await this.storage
+      .bucket(this.bucket)
+      .file(path)
+      .delete({ ignoreNotFound: true });
+  }
+
+  async deleteImageByUrl(url: string) {
+    const path = url.split(`${this.bucketBaseUrl}/${this.bucket}/`)[1];
+    if (!path) return;
     await this.storage
       .bucket(this.bucket)
       .file(path)

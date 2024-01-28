@@ -5,10 +5,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { GlobalException } from 'src/common/dto/response.dto';
 import { ArtistService } from 'src/artist/artist.service';
-import { DetailFeedDto, FeedsDto } from './dto/get-feed.dto';
+import { DetailFeedDto, FeedDto, FeedsDto } from './dto/get-feed.dto';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { StorageService } from 'src/storage/storage.service';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommunityService {
@@ -58,7 +59,7 @@ export class CommunityService {
       .orderBy('feed.createdAt', 'DESC');
   }
 
-  private async getFeeds(favoriteArtistId: number) {
+  private async getFeeds(favoriteArtistId: number): Promise<FeedDto[]> {
     const feedQueryBuilder = await this.createFeedQueryBuilder(
       favoriteArtistId,
       1, // status: 1
@@ -101,6 +102,8 @@ export class CommunityService {
       console.log(feedId);
       throw new GlobalException(err, 500);
     }
+
+    if (!feed) throw new GlobalException('존재하지 않는 피드입니다.', 404);
 
     // 데이터 전처리
     this.processFeedData(feed);
@@ -157,7 +160,145 @@ export class CommunityService {
         userId,
       });
     } catch (error) {
-      throw new GlobalException('피드 생성에 실패했습니다.', 500);
+      throw new GlobalException('피드 생성에 실패했습니다.', 400);
+    }
+  }
+
+  async updateFeed(
+    feedId: number,
+    userId: number,
+    createFeedDto: CreateFeedDto,
+    imageFile: Express.Multer.File,
+  ) {
+    const { content } = createFeedDto;
+
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      if (feed?.userProfile?.id !== userId)
+        throw new GlobalException('피드 수정 권한이 없습니다.', 403);
+      // 사진을 수정했는지 확인한다.
+      let imageUrl;
+      if (imageFile) {
+        const path = `feed/${Date.now()}_${imageFile.originalname}`;
+        // 기존 사진을 삭제한다.
+        await this.storageService.deleteImageByUrl(feed.thumbnailUrl);
+        // 이미지를 저장한다.
+        imageUrl = await this.storageService.saveImage(path, imageFile);
+      }
+      await this.feedRepository.update(feedId, {
+        content,
+        thumbnailUrl: imageUrl || feed.thumbnailUrl,
+      });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('피드 수정에 실패했습니다.', 400);
+    }
+  }
+
+  async deleteFeed(feedId: number, userId: number) {
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      if (feed?.userProfile?.id !== userId)
+        throw new GlobalException('피드 수정 권한이 없습니다.', 403);
+      await this.feedRepository.update(feedId, { status: 2 });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('피드 삭제에 실패했습니다.', 400);
+    }
+  }
+
+  // 댓글
+  async createComment(feedId: number, userId: number, content: string) {
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      await this.getFeedById(feedId);
+      await this.commentRepository.save({
+        feedId,
+        userId,
+        content,
+      });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('댓글 생성에 실패했습니다.', 400);
+    }
+  }
+
+  private async getCommentById(commentId: number) {
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId, status: 1 },
+    });
+    if (!comment)
+      throw new GlobalException('존재하지 않거나 삭제된 댓글입니다.', 404);
+    return comment;
+  }
+
+  async updateComment(commentId: number, userId: number, content: string) {
+    try {
+      // 댓글이 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const comment = await this.getCommentById(commentId);
+      if (comment?.userId !== userId)
+        throw new GlobalException('댓글 수정 권한이 없습니다.', 403);
+      await this.commentRepository.update(commentId, {
+        content,
+      });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('댓글 수정에 실패했습니다.', 400);
+    }
+  }
+
+  async deleteComment(commentId: number, userId: number) {
+    try {
+      // 댓글이 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const comment = await this.getCommentById(commentId);
+      if (comment?.userId !== userId)
+        throw new GlobalException('댓글 삭제 권한이 없습니다.', 403);
+      await this.commentRepository.update(commentId, { status: 2 });
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('댓글 삭제에 실패했습니다.', 400);
+    }
+  }
+
+  async createLike(feedId: number, userId: number) {
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      // 글 작성자가 누르는 경우
+      if (feed?.userProfile?.id === userId)
+        throw new GlobalException(
+          '자신의 글에는 좋아요를 누를 수 없습니다.',
+          403,
+        );
+      await this.feedRepository.update(feedId, {
+        likeCount: feed.likeCount + 1,
+      });
+      return feed.likeCount + 1;
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('좋아요 처리에 실패했습니다.', 400);
+    }
+  }
+
+  async deleteLike(feedId: number, userId: number) {
+    try {
+      // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
+      const feed = await this.getFeedById(feedId);
+      // 글 작성자가 누르는 경우
+      if (feed?.userProfile?.id === userId)
+        throw new GlobalException(
+          '자신의 글에는 좋아요를 누를 수 없습니다.',
+          403,
+        );
+      await this.feedRepository.update(feedId, {
+        likeCount: feed.likeCount - 1,
+      });
+      return feed.likeCount - 1;
+    } catch (error) {
+      if (error instanceof GlobalException) throw error;
+      throw new GlobalException('좋아요 처리에 실패했습니다.', 400);
     }
   }
 }
