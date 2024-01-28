@@ -88,13 +88,19 @@ export class CommunityService {
   }
 
   async getFeedById(feedId: number): Promise<DetailFeedDto> {
-    // 피드를 가져온다.
-    const feed = await this.feedRepository
-      .createQueryBuilder('feed')
-      .innerJoinAndSelect('feed.userProfile', 'userProfile')
-      .where('feed.id = :feedId', { feedId })
-      .andWhere('feed.status = :status', { status: 1 })
-      .getOne();
+    let feed;
+    try {
+      // 피드를 가져온다.
+      feed = await this.feedRepository
+        .createQueryBuilder('feed')
+        .innerJoinAndSelect('feed.userProfile', 'userProfile')
+        .where('feed.id = :feedId', { feedId })
+        .andWhere('feed.status = :status', { status: 1 })
+        .getOne();
+    } catch (err) {
+      console.log(feedId);
+      throw new GlobalException(err, 500);
+    }
 
     // 데이터 전처리
     this.processFeedData(feed);
