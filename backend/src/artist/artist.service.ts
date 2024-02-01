@@ -29,7 +29,7 @@ export class ArtistService {
     }
   }
 
-  async getArtistById(id: number): Promise<ArtistDto> {
+  async getArtistById(id: number) {
     try {
       const artist = await this.artistRepository.findOne({ where: { id } });
       if (!artist) {
@@ -40,6 +40,7 @@ export class ArtistService {
         id: artist.id,
         name: artist.name,
         thumbnailUrl: artist.thumbnailUrl,
+        youtubeChannelId: artist.youtubeChannelId,
       };
     } catch (error) {
       throw new GlobalException('데이터베이스 오류', 500);

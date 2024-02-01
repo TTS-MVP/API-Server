@@ -10,4 +10,7 @@ export class ArtistEntity {
 
   @Column('text', { name: 'thumbnail_url' })
   thumbnailUrl: string;
+
+  @Column('text', { name: 'youtube_channel_id' })
+  youtubeChannelId: string;
 }

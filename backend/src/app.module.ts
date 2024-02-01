@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { CommunityModule } from './community/community.module';
 import { StorageModule } from './storage/storage.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     CommunityModule,
     StorageModule,
     ScheduleModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
