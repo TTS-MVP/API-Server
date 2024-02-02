@@ -162,14 +162,24 @@ export class UserService {
       userId,
       favoriteArtistId,
     );
+    delete favoriteArtistProfile.youtubeChannelId;
 
     // 데이터 전처리
     delete userProfileData.favoriteArtistId;
+
+    // 랭킹 조회
+    const rank = await this.voteService.getUserRank(userId);
+    const artistRank = await this.voteService.getUserArtistRank(
+      userId,
+      favoriteArtistId,
+    );
 
     return {
       userProfile: userProfileData,
       favoriteArtistProfile: favoriteArtistProfile,
       contribution: fanContribution,
+      rank: rank,
+      artistRank: artistRank,
     };
   }
 }

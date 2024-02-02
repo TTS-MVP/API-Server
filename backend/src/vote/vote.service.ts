@@ -154,4 +154,51 @@ export class VoteService {
 
     return result;
   }
+
+  async getUserRank(userId: number): Promise<number> {
+    try {
+      const userRank = await this.artistFanCountRepository
+        .createQueryBuilder()
+        .select(['a.id', 'a.voteCount'])
+        .addSelect(
+          '(@rank := IF(@last = a.voteCount, @rank, @rank + 1)) AS rank',
+        )
+        .addSelect('(@last := a.voteCount) AS last')
+        .from(
+          `(SELECT id, voteCount FROM monthly_fan_vote_view ORDER BY voteCount DESC)`,
+          'a',
+        )
+        .from(`(SELECT @last := NULL, @rank := 0)`, 'b')
+        .where('a.id = :userId', { userId })
+        .getRawOne();
+
+      if (!userRank) {
+        throw new GlobalException('유저 랭킹을 불러올 수 없습니다.', 400);
+      }
+
+      return Number(userRank.rank);
+    } catch (error) {
+      // 로깅 또는 예외 처리 추가
+      throw error;
+    }
+  }
+
+  async getUserArtistRank(userId: number, artistId: number) {
+    const userRank = await this.artistFanCountRepository
+      .createQueryBuilder()
+      .select(['a.id', 'a.voteCount'])
+      .addSelect('(@rank := IF(@last = a.voteCount, @rank, @rank + 1)) AS rank')
+      .addSelect('(@last := a.voteCount) AS last')
+      .from(
+        `(SELECT id, voteCount FROM monthly_fan_vote_view WHERE favoriteArtistId = :artistId ORDER BY voteCount DESC)`,
+        'a',
+      )
+      .setParameter('artistId', artistId)
+      .from(`(SELECT @last := NULL, @rank := 0)`, 'b')
+      .where('a.id = :userId', { userId })
+      .getRawOne();
+    if (!userRank)
+      throw new GlobalException('유저 랭킹을 불러올 수 없습니다.', 400);
+    return Number(userRank.rank);
+  }
 }
