@@ -54,6 +54,12 @@ export class VoteResultDto {
 export class MonthlyArtistSummaryDto {
   @ApiProperty({
     example: 1,
+    description: '아티스트 랭킹',
+  })
+  rank: number;
+
+  @ApiProperty({
+    example: 1,
     description: '아티스트 아이디',
   })
   id: number;
