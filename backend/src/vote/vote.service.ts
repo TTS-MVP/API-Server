@@ -11,6 +11,7 @@ import { UserVoteCountView } from './entity/vote-count.view';
 import { VoteEntity } from './entity/vote.entity';
 import { MonthlyArtistSummaryDto, VoteResultDto } from './dto/vote.dto';
 import { ArtistService } from 'src/artist/artist.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class VoteService {
@@ -62,11 +63,31 @@ export class VoteService {
   async getMonthlyArtistVotes(): Promise<MonthlyArtistVoteDto[]> {
     // voteCount 순으로 내림차순 정렬, 같을 시 name 오름차순 정렬
     const ArtistVotes = await this.monthlyArtistVoteRepository.find();
+    const transformedVotes = ArtistVotes.map((item) => {
+      item['voteCount'] = Number(item['voteCount']);
+      return plainToInstance(MonthlyArtistVoteDto, item);
+    });
 
-    return ArtistVotes.map((item) => ({
-      ...item,
-      voteCount: Number(item.voteCount),
-    }));
+    // 랭킹 계산(동점자 계산)
+    let rank = 1;
+    transformedVotes[0]['rank'] = rank;
+
+    for (let i = 1; i < transformedVotes.length; i++) {
+      // 이전 투표자의 랭킹과 투표 수 비교
+      if (
+        transformedVotes[i]['voteCount'] ===
+        transformedVotes[i - 1]['voteCount']
+      ) {
+        // 동점자인 경우 이전 투표자와 동일한 랭킹 부여
+        transformedVotes[i]['rank'] = transformedVotes[i - 1]['rank'];
+      } else {
+        // 동점자가 아닌 경우 현재 랭킹을 증가시킴
+        rank++;
+        transformedVotes[i]['rank'] = rank;
+      }
+    }
+
+    return transformedVotes;
   }
 
   async getMonthlyFanVotes(
