@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ArtistService } from 'src/artist/artist.service';
 import { GlobalException } from 'src/common/dto/response.dto';
 import { UserService } from 'src/user/user.service';
+import { VideoItemDTO } from './dto/media.dto';
 
 @Injectable()
 export class MediaService {
@@ -107,6 +108,7 @@ export class MediaService {
           thumbnailUrl: item.snippet.thumbnails.high.url,
           publishedAt: item.snippet.publishedAt,
           url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+          views: 0,
         };
         mediaItems.push(data);
       });
@@ -117,7 +119,7 @@ export class MediaService {
     return mediaItems;
   }
 
-  async getMedia(userId: number) {
+  async getMedia(userId: number): Promise<VideoItemDTO[]> {
     // 유저 최애 아티스트 조회
     const userProfile = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userProfile?.favoriteArtistId;

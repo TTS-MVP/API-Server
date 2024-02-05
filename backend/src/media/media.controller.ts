@@ -4,6 +4,7 @@ import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { ApiGetMedia } from './decorator/swagger.decorator';
+import { VideoItemDTO } from './dto/media.dto';
 
 @ApiTags('미디어')
 @UseGuards(AuthGuard)
@@ -14,7 +15,7 @@ export class MediaController {
 
   @ApiGetMedia()
   @Get()
-  async getMedia(@Req() request) {
+  async getMedia(@Req() request): Promise<ResponseDto<VideoItemDTO[]>> {
     const userId = request['userInfo']?.userId;
     if (!userId) throw new GlobalException('유저 정보가 없습니다.', 400);
     const medias = await this.mediaService.getMedia(userId);

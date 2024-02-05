@@ -157,22 +157,15 @@ export class VoteService {
 
   async getUserRank(type: number, userId: number) {
     const users = await this.getMonthlyFanVotes(type, userId);
-    const user = users.find((user) => user.id === userId);
-    if (!user) throw new GlobalException('존재하지 않는 사용자입니다.', 404);
 
-    const sortedUsers = users.sort(
-      (a, b) => Number(b.voteCount) - Number(a.voteCount),
-    );
-
-    // Find the index of the user in the sorted array
-    const userIndex = sortedUsers.findIndex((user) => user.id === userId);
+    const userIndex = users.findIndex((user) => user.id === userId);
+    if (userIndex === -1) {
+      throw new GlobalException('유저의 랭킹을 조회할 수 없습니다.', 400);
+    }
 
     // Check for ties by comparing vote counts
     let rank = userIndex;
-    while (
-      rank > 0 &&
-      sortedUsers[rank - 1].voteCount === sortedUsers[rank].voteCount
-    ) {
+    while (rank > 0 && users[rank - 1].voteCount === users[rank].voteCount) {
       rank--;
     }
 

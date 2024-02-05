@@ -18,15 +18,16 @@ export class VideoItemDTO {
     description: '영상 게시 날짜',
   })
   publishedAt: Date;
-}
 
-export class VideoListDTO {
   @ApiProperty({
-    example: '임영웅 노래 모음',
-    description: '콘텐츠 시리즈 제목',
+    example: 'https://www.youtube.com/watch?v=KZMAvB1unQs',
+    description: '영상 URL',
   })
-  seriesName: string;
+  url: string;
 
-  @ApiProperty({ type: [VideoItemDTO] })
-  items: VideoItemDTO[];
+  @ApiProperty({
+    example: 0,
+    description: '영상 조회수',
+  })
+  views: number;
 }

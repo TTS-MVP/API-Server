@@ -1,5 +1,5 @@
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { VideoListDTO } from '../dto/media.dto';
+import { VideoItemDTO } from '../dto/media.dto';
 
 export const ApiGetMedia = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -11,7 +11,7 @@ export const ApiGetMedia = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 미디어를 조회했을 때의 응답',
-      type: [VideoListDTO],
+      type: [VideoItemDTO],
     })(target, key, descriptor);
   };
 };
