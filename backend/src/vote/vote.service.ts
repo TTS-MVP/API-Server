@@ -9,7 +9,7 @@ import { MonthlyFanVoteDto } from './dto/monthly-fan-vote.dto';
 import { MonthlyArtistVoteDto } from './dto/monthly-artist-vote.dto';
 import { UserVoteCountView } from './entity/vote-count.view';
 import { VoteEntity } from './entity/vote.entity';
-import { VoteResultDto } from './dto/vote.dto';
+import { MonthlyArtistSummaryDto, VoteResultDto } from './dto/vote.dto';
 import { ArtistService } from 'src/artist/artist.service';
 
 @Injectable()
@@ -26,6 +26,39 @@ export class VoteService {
     private artistService: ArtistService,
     private userService: UserService,
   ) {}
+
+  /*
+  상단에 최애를 기준으로 위로 2명, 아래로 1명의 이달의 투표 순위
+  */
+  async getMonthlyArtistVotesSummary(userId: number) {
+    let votes = await this.getMonthlyArtistVotes();
+    const userFavoriteArtistId = (
+      await this.userService.getUserProfileByUserId(userId)
+    ).favoriteArtistId;
+    if (!userFavoriteArtistId) {
+      throw new GlobalException('최애 아티스트를 설정해주세요.', 400);
+    }
+
+    const userFavoriteArtist = votes.findIndex(
+      (vote) => vote.id === userFavoriteArtistId,
+    );
+    if (userFavoriteArtist === -1) {
+      throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
+    }
+
+    if (userFavoriteArtist < 2) {
+      votes = votes.slice(0, 4);
+    } else if (userFavoriteArtist >= votes.length - 4) {
+      votes = votes.slice(-4);
+    } else {
+      votes = votes.slice(userFavoriteArtist - 2, userFavoriteArtist + 1);
+    }
+    votes.forEach((vote) => {
+      vote['isFavorite'] = vote.id === userFavoriteArtistId;
+    });
+    return votes;
+  }
+
   async getMonthlyArtistVotes(): Promise<MonthlyArtistVoteDto[]> {
     // voteCount 순으로 내림차순 정렬, 같을 시 name 오름차순 정렬
     const ArtistVotes = await this.monthlyArtistVoteRepository.find();

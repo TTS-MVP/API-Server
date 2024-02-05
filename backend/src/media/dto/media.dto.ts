@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 export class VideoItemDTO {
   @ApiProperty({
@@ -29,5 +30,20 @@ export class VideoItemDTO {
     example: 0,
     description: '영상 조회수',
   })
+  views: number;
+}
+
+export class SummaryVideoDTO extends OmitType(VideoItemDTO, [
+  'publishedAt',
+  'title',
+  'views',
+]) {
+  @Exclude()
+  publishedAt: Date;
+
+  @Exclude()
+  title: string;
+
+  @Exclude()
   views: number;
 }

@@ -13,74 +13,11 @@ export class MediaService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
-  // 아티스트의 유튜브 재생목록 id들 조회
-  private async getArtistYoutubePlaylistInfos(
-    channelId: string,
-    maxResults: number = 50,
-  ) {
-    const playlistNames = [];
-    const playlistIds = [];
-
-    const playlistsUrl = `https://www.googleapis.com/youtube/v3/playlists`;
-
-    const playlistsParams = {
-      part: 'snippet',
-      channelId,
-      key: this.configService.get('YOUTUBE_API_KEY'),
-      maxResults,
-    };
-
-    try {
-      const playlistsRes = await axios.get(`${playlistsUrl}`, {
-        params: playlistsParams,
-      });
-      const playlistsData = playlistsRes.data;
-
-      for (const item of playlistsData.items) {
-        playlistNames.push(item.snippet.title);
-        playlistIds.push(item.id);
-      }
-    } catch (error) {
-      throw new GlobalException('유튜브 API 호출에 실패했습니다.', 500);
-    }
-
-    return [playlistNames, playlistIds];
-  }
-
-  private async getPlaylistItems(playlistId: string, maxResults: number = 50) {
-    const playlistItems = [];
-    const playlistItemsUrl = `https://www.googleapis.com/youtube/v3/playlistItems`;
-
-    const playlistItemsParams = {
-      part: 'snippet',
-      playlistId,
-      key: this.configService.get('YOUTUBE_API_KEY'),
-      maxResults,
-    };
-
-    try {
-      const playlistItemsRes = await axios.get(`${playlistItemsUrl}`, {
-        params: playlistItemsParams,
-      });
-      const playlistItemsData = playlistItemsRes.data;
-      playlistItemsData.items.forEach((item) => {
-        const data = {
-          title: item.snippet.title,
-          thumbnailUrl: item.snippet.thumbnails.standard.url,
-          publishedAt: item.snippet.publishedAt,
-        };
-        playlistItems.push(data);
-      });
-    } catch (error) {
-      throw new GlobalException('유튜브 API 호출에 실패했습니다.', 500);
-    }
-
-    return playlistItems;
-  }
 
   private async getArtistYoutubeMedias(
     channelId: string,
     maxResults: number = 50,
+    order: 'date' | 'viewCount' = 'date',
   ) {
     const mediaItems = [];
     const mediaItemsUrl = `https://www.googleapis.com/youtube/v3/search`;
@@ -90,7 +27,7 @@ export class MediaService {
       channelId,
       key: this.configService.get('YOUTUBE_API_KEY'),
       maxResults,
-      order: 'date',
+      order: order,
       type: 'video',
       q: '',
     };
@@ -119,7 +56,11 @@ export class MediaService {
     return mediaItems;
   }
 
-  async getMedia(userId: number): Promise<VideoItemDTO[]> {
+  async getMedia(
+    userId: number,
+    order: 'date' | 'viewCount' = 'date',
+    limit: number = 20,
+  ): Promise<VideoItemDTO[]> {
     // 유저 최애 아티스트 조회
     const userProfile = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userProfile?.favoriteArtistId;
@@ -135,7 +76,11 @@ export class MediaService {
     }
 
     // 유튜브 채널 ID로 업로드 영상 조회
-    const result = await this.getArtistYoutubeMedias(artistYoutubeId, 20);
+    const result = await this.getArtistYoutubeMedias(
+      artistYoutubeId,
+      limit,
+      order,
+    );
 
     return result;
   }

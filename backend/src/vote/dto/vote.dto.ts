@@ -50,3 +50,36 @@ export class VoteResultDto {
   @IsInt()
   rank: number;
 }
+
+export class MonthlyArtistSummaryDto {
+  @ApiProperty({
+    example: 1,
+    description: '아티스트 아이디',
+  })
+  id: number;
+
+  @ApiProperty({
+    example: '박서진',
+    description: '아티스트 이름',
+  })
+  name: string;
+
+  @ApiProperty({
+    example:
+      'https://storage.googleapis.com/tniverse-seoul-dev-storage-01/artist/%EB%B0%95%EC%84%9C%EC%A7%84.jpg',
+    description: '아티스트 썸네일 URL',
+  })
+  thumbnailUrl: string;
+
+  @ApiProperty({
+    example: 55,
+    description: '투표 수',
+  })
+  voteCount: number;
+
+  @ApiProperty({
+    example: true,
+    description: '최애 아티스트 여부',
+  })
+  isFavorite: boolean;
+}

@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [ArtistModule, UserModule, AuthModule],
   controllers: [MediaController],
   providers: [MediaService],
+  exports: [MediaService],
 })
 export class MediaModule {}

@@ -19,5 +19,6 @@ import { StorageModule } from 'src/storage/storage.module';
   ],
   controllers: [CommunityController],
   providers: [CommunityService],
+  exports: [CommunityService],
 })
 export class CommunityModule {}

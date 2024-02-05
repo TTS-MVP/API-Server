@@ -5,11 +5,16 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { GlobalException } from 'src/common/dto/response.dto';
 import { ArtistService } from 'src/artist/artist.service';
-import { DetailFeedDto, FeedDto, FeedsDto } from './dto/get-feed.dto';
+import {
+  DetailFeedDto,
+  FeedDto,
+  FeedsDto,
+  summaryFeedDto,
+} from './dto/get-feed.dto';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { StorageService } from 'src/storage/storage.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CommunityService {
@@ -23,15 +28,34 @@ export class CommunityService {
     private readonly storageService: StorageService,
   ) {}
 
+  async getHotFeeds(): Promise<summaryFeedDto[]> {
+    const feedQueryBuilder = await this.feedRepository
+      .createQueryBuilder('feed')
+      .where('feed.status = :status', { status: 1 })
+      .andWhere('feed.thumbnailUrl IS NOT NULL')
+      .orderBy('feed.likeCount', 'DESC')
+      .limit(5);
+    const feeds = await feedQueryBuilder.getMany();
+
+    // summaryFeedDto로 변환
+    const transformedFeeds = feeds.map((feed) =>
+      plainToInstance(summaryFeedDto, feed),
+    );
+
+    return transformedFeeds;
+  }
+
   private async processFeedData(feed: FeedEntity) {
     delete feed.userId;
     delete feed.favoriteArtistId;
     delete feed.status;
-    feed.userProfile = {
-      id: feed.userProfile.id,
-      nickName: feed.userProfile.nickName,
-      thumbnailUrl: feed.userProfile.thumbnailUrl,
-    };
+    if (feed.userProfile) {
+      feed.userProfile = {
+        id: feed.userProfile.id,
+        nickName: feed.userProfile.nickName,
+        thumbnailUrl: feed.userProfile.thumbnailUrl,
+      };
+    }
   }
 
   private async processCommentData(comment: CommentEntity) {

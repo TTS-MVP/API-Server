@@ -11,6 +11,7 @@ import { CommunityModule } from './community/community.module';
 import { StorageModule } from './storage/storage.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { MediaModule } from './media/media.module';
+import { HomeModule } from './home/home.module';
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { MediaModule } from './media/media.module';
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
     }),
+    HomeModule,
+    UserModule,
     ArtistModule,
     VoteModule,
-    UserModule,
     CommunityModule,
     StorageModule,
     ScheduleModule,

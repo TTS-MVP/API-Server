@@ -48,6 +48,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true, // authorization 헤더를 자동으로 추가해줍니다.
+      defaultModelsExpandDepth: -1, // 모든 모델을 펼쳐서 보여줍니다.
     },
   });
 

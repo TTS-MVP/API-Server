@@ -2,6 +2,7 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ArtistDto } from 'src/artist/dto/artist.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CommentDto } from './comment.dto';
+import { Exclude, Expose } from 'class-transformer';
 
 class UserProfileDto extends OmitType(CreateUserDto, [
   'favoriteArtistId',
@@ -10,12 +11,15 @@ class UserProfileDto extends OmitType(CreateUserDto, [
 }
 
 export class FeedDto {
+  @Expose()
   @ApiProperty({ example: 1, description: '피드 고유 식별자' })
   id: number;
 
+  @Expose()
   @ApiProperty({ example: '글 내용입니다.' })
   content: string;
 
+  @Expose()
   @ApiProperty({
     required: false,
     default: null,
@@ -25,16 +29,48 @@ export class FeedDto {
   })
   thumbnailUrl?: string | null;
 
+  @Expose()
   @ApiProperty({ default: 0, description: '피드의 좋아요 수' })
   likeCount?: number;
 
+  @Expose()
   @ApiProperty({ description: '피드 작성 시간' })
   createdAt?: Date;
 
+  @Expose()
   @ApiProperty({ description: '피드 수정 시간' })
   updatedAt?: Date;
 
+  @Expose()
   @ApiProperty({ type: UserProfileDto })
+  userProfile?: UserProfileDto;
+
+  @Exclude()
+  userId?: number;
+
+  @Exclude()
+  status?: number;
+
+  @Exclude()
+  favoriteArtistId?: number;
+}
+
+export class summaryFeedDto extends OmitType(FeedDto, [
+  'likeCount',
+  'createdAt',
+  'updatedAt',
+  'userProfile',
+] as const) {
+  @Exclude()
+  likeCount?: number;
+
+  @Exclude()
+  createdAt?: Date;
+
+  @Exclude()
+  updatedAt?: Date;
+
+  @Exclude()
   userProfile?: UserProfileDto;
 }
 

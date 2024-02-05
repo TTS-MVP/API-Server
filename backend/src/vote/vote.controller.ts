@@ -11,6 +11,7 @@ import { VoteService } from './vote.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   ApiGetMonthlyArtistVotes,
+  ApiGetMonthlyArtistVotesSummary,
   ApiGetMonthlyFanVotes,
   ApiVoteArtist,
 } from './decorator/swagger.decorator';
@@ -26,6 +27,20 @@ import { VoteInfo, VoteResultDto } from './dto/vote.dto';
 @Controller('vote')
 export class VoteController {
   constructor(private readonly voteService: VoteService) {}
+
+  @ApiGetMonthlyArtistVotesSummary()
+  @Get('monthly-artist-summary')
+  async getMonthlyArtistVotesSummary(@Req() request) {
+    const userId = request['userInfo'].userId;
+    if (!userId) throw new GlobalException('유저 정보가 없습니다.', 400);
+    const votes = await this.voteService.getMonthlyArtistVotesSummary(userId);
+    return new ResponseDto(
+      true,
+      200,
+      '월간 아티스트 투표 순위 요약 조회 성공',
+      votes,
+    );
+  }
 
   @ApiGetMonthlyArtistVotes()
   @Get('monthly-artist')
