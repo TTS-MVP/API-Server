@@ -77,9 +77,47 @@ export class MediaService {
     return playlistItems;
   }
 
-  async getMedia(userId: number) {
-    const result = [];
+  private async getArtistYoutubeMedias(
+    channelId: string,
+    maxResults: number = 50,
+  ) {
+    const mediaItems = [];
+    const mediaItemsUrl = `https://www.googleapis.com/youtube/v3/search`;
 
+    const mediaItemsParams = {
+      part: 'snippet',
+      channelId,
+      key: this.configService.get('YOUTUBE_API_KEY'),
+      maxResults,
+      order: 'date',
+      type: 'video',
+      q: '',
+    };
+
+    try {
+      const mediaItemsRes = await axios.get(`${mediaItemsUrl}`, {
+        params: mediaItemsParams,
+      });
+      const mediaItemsData = mediaItemsRes.data;
+      mediaItemsData.items.forEach((item) => {
+        // 쇼츠 영상은 제외
+        //if (item.snippet.description == 'shorts.') return;
+        const data = {
+          title: item.snippet.title,
+          thumbnailUrl: item.snippet.thumbnails.high.url,
+          publishedAt: item.snippet.publishedAt,
+          url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+        };
+        mediaItems.push(data);
+      });
+    } catch (error) {
+      throw new GlobalException('유튜브 API 호출에 실패했습니다.', 500);
+    }
+
+    return mediaItems;
+  }
+
+  async getMedia(userId: number) {
     // 유저 최애 아티스트 조회
     const userProfile = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userProfile?.favoriteArtistId;
@@ -94,26 +132,8 @@ export class MediaService {
       return [];
     }
 
-    // 유튜브 API를 통해 해당 아티스트의 재생목록들 조회
-    const [playlistNames, playlistIds] =
-      await this.getArtistYoutubePlaylistInfos(artistYoutubeId);
-
-    for (const playlistId of playlistIds) {
-      const playlistItems = await this.getPlaylistItems(playlistId, 5);
-      const seriesName = playlistNames[playlistIds.indexOf(playlistId)];
-
-      // 시리즈 아이템 배열에 추가
-      const seriesItem = {
-        seriesName,
-        items: playlistItems.map((item) => ({
-          title: item.title,
-          thumbnailUrl: item.thumbnailUrl,
-          publishedAt: item.publishedAt,
-        })),
-      };
-
-      result.push(seriesItem);
-    }
+    // 유튜브 채널 ID로 업로드 영상 조회
+    const result = await this.getArtistYoutubeMedias(artistYoutubeId, 20);
 
     return result;
   }
