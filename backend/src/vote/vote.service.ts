@@ -155,50 +155,28 @@ export class VoteService {
     return result;
   }
 
-  async getUserRank(userId: number): Promise<number> {
-    try {
-      const userRank = await this.artistFanCountRepository
-        .createQueryBuilder()
-        .select(['a.id', 'a.voteCount'])
-        .addSelect(
-          '(@rank := IF(@last = a.voteCount, @rank, @rank + 1)) AS rank',
-        )
-        .addSelect('(@last := a.voteCount) AS last')
-        .from(
-          `(SELECT id, voteCount FROM monthly_fan_vote_view ORDER BY voteCount DESC)`,
-          'a',
-        )
-        .from(`(SELECT @last := NULL, @rank := 0)`, 'b')
-        .where('a.id = :userId', { userId })
-        .getRawOne();
+  async getUserRank(type: number, userId: number) {
+    const users = await this.getMonthlyFanVotes(type, userId);
+    const user = users.find((user) => user.id === userId);
+    if (!user) throw new GlobalException('존재하지 않는 사용자입니다.', 404);
 
-      if (!userRank) {
-        throw new GlobalException('유저 랭킹을 불러올 수 없습니다.', 400);
-      }
+    const sortedUsers = users.sort(
+      (a, b) => Number(b.voteCount) - Number(a.voteCount),
+    );
 
-      return Number(userRank.rank);
-    } catch (error) {
-      // 로깅 또는 예외 처리 추가
-      throw error;
+    // Find the index of the user in the sorted array
+    const userIndex = sortedUsers.findIndex((user) => user.id === userId);
+
+    // Check for ties by comparing vote counts
+    let rank = userIndex;
+    while (
+      rank > 0 &&
+      sortedUsers[rank - 1].voteCount === sortedUsers[rank].voteCount
+    ) {
+      rank--;
     }
-  }
 
-  async getUserArtistRank(userId: number, artistId: number) {
-    const userRank = await this.artistFanCountRepository
-      .createQueryBuilder()
-      .select(['a.id', 'a.voteCount'])
-      .addSelect('(@rank := IF(@last = a.voteCount, @rank, @rank + 1)) AS rank')
-      .addSelect('(@last := a.voteCount) AS last')
-      .from(
-        `(SELECT id, voteCount FROM monthly_fan_vote_view WHERE favoriteArtistId = :artistId ORDER BY voteCount DESC)`,
-        'a',
-      )
-      .setParameter('artistId', artistId)
-      .from(`(SELECT @last := NULL, @rank := 0)`, 'b')
-      .where('a.id = :userId', { userId })
-      .getRawOne();
-    if (!userRank)
-      throw new GlobalException('유저 랭킹을 불러올 수 없습니다.', 400);
-    return Number(userRank.rank);
+    // Return the rank (1-based index)
+    return rank + 1;
   }
 }

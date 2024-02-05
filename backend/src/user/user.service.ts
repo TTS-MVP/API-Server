@@ -168,11 +168,8 @@ export class UserService {
     delete userProfileData.favoriteArtistId;
 
     // 랭킹 조회
-    const rank = await this.voteService.getUserRank(userId);
-    const artistRank = await this.voteService.getUserArtistRank(
-      userId,
-      favoriteArtistId,
-    );
+    const rank = await this.voteService.getUserRank(0, userId);
+    const artistRank = await this.voteService.getUserRank(1, userId);
 
     return {
       userProfile: userProfileData,
