@@ -51,7 +51,7 @@ export class VoteService {
     } else if (userFavoriteArtist >= votes.length - 4) {
       votes = votes.slice(-4);
     } else {
-      votes = votes.slice(userFavoriteArtist - 2, userFavoriteArtist + 1);
+      votes = votes.slice(userFavoriteArtist - 2, userFavoriteArtist + 2);
     }
     votes.forEach((vote) => {
       vote['isFavorite'] = vote.id === userFavoriteArtistId;
