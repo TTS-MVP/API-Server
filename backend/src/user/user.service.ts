@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserProfileEntity } from './entity/user-profile.entity';
 import { ArtistService } from 'src/artist/artist.service';
 import { VoteService } from 'src/vote/vote.service';
+import { UserProfileDTO } from './dto/profile.dto';
 
 @Injectable()
 export class UserService {
@@ -138,7 +139,7 @@ export class UserService {
     return savedUserProfile;
   }
 
-  async getProfile(userId: number) {
+  async getProfile(userId: number): Promise<UserProfileDTO> {
     // 유저 정보 조회
     const userProfileData = await this.getUserProfileByUserId(userId);
     if (!userProfileData) {
@@ -147,7 +148,6 @@ export class UserService {
     // 데이터 전처리
     delete userProfileData.createdAt;
     delete userProfileData.updatedAt;
-    delete userProfileData.registedAt;
 
     // 최애 아티스트 프로필 조회
     const favoriteArtistId = userProfileData.favoriteArtistId;
@@ -171,12 +171,22 @@ export class UserService {
     const rank = await this.voteService.getUserRank(0, userId);
     const artistRank = await this.voteService.getUserRank(1, userId);
 
+    // 이번 달 투표 횟수 조회
+    const voteCount = await this.voteService.getUserVoteById(userId);
+
     return {
-      userProfile: userProfileData,
+      userProfile: {
+        ...userProfileData,
+        voteCount,
+        registedAt: Math.floor(
+          (Date.now() - userProfileData.registedAt.getTime()) / 86400000,
+        ),
+        contribution: fanContribution,
+        rank: rank,
+        artistRank: artistRank,
+      },
+
       favoriteArtistProfile: favoriteArtistProfile,
-      contribution: fanContribution,
-      rank: rank,
-      artistRank: artistRank,
     };
   }
 }

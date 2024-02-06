@@ -16,7 +16,7 @@ import {
 } from './decorator/swagger.decorator';
 import { SocialLoginTypeDto } from 'src/auth/dto/auth.dto';
 import { ResponseDto } from 'src/common/dto/response.dto';
-import { userProfileDto } from './dto/profile.dto';
+import { UserProfileDTO } from './dto/profile.dto';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { VoteService } from 'src/vote/vote.service';
 import { ApiVote } from 'src/vote/decorator/swagger.decorator';

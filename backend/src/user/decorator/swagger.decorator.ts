@@ -3,7 +3,7 @@ import {
   isExistUserLoginDto,
   isNotExistUserLoginDto,
 } from '../dto/login-user.dto';
-import { userProfileDto } from '../dto/profile.dto';
+import { UserProfileDTO } from '../dto/profile.dto';
 
 export const ApiLogin = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -75,7 +75,7 @@ export const ApiProfile = () => {
     ApiResponse({
       status: 200,
       description: '프로필 조회 성공 시의 응답',
-      type: userProfileDto,
+      type: UserProfileDTO,
     })(target, key, descriptor);
 
     ApiResponse({
