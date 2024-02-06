@@ -17,6 +17,7 @@ import { StorageService } from 'src/storage/storage.service';
 import { plainToInstance } from 'class-transformer';
 import { CommentDto } from './dto/comment.dto';
 import { SummaryProfileDTO } from 'src/user/dto/profile.dto';
+import { ArtistDto } from 'src/artist/dto/artist.dto';
 
 @Injectable()
 export class CommunityService {
@@ -47,7 +48,7 @@ export class CommunityService {
     return transformedFeeds;
   }
 
-  private async processFeedData(feed) {
+  private async processFeedData(feed): Promise<FeedDto> {
     let transformedFeed = plainToInstance(FeedDto, feed);
     transformedFeed = {
       ...transformedFeed,
@@ -60,7 +61,15 @@ export class CommunityService {
   }
 
   private async processCommentData(comment: CommentEntity) {
-    return plainToInstance(CommentDto, comment);
+    let transformedComment = plainToInstance(CommentDto, comment);
+    transformedComment = {
+      ...transformedComment,
+      userProfile: plainToInstance(
+        SummaryProfileDTO,
+        transformedComment.userProfile,
+      ),
+    };
+    return transformedComment;
   }
 
   private async createFeedQueryBuilder(
@@ -85,7 +94,7 @@ export class CommunityService {
     return feedQueryBuilder.getMany();
   }
 
-  async getFeed(userId: number) {
+  async getFeed(userId: number): Promise<FeedsDto> {
     const userInfo = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userInfo?.favoriteArtistId;
     if (!favoriteArtistId)
@@ -95,13 +104,15 @@ export class CommunityService {
       favoriteArtistId,
     );
 
-    const feeds = await this.getFeeds(favoriteArtistId);
+    let feeds;
+    feeds = await this.getFeeds(favoriteArtistId);
 
     // 데이터 전처리
-    feeds.forEach(this.processFeedData);
+    feeds = await Promise.all(feeds.map(this.processFeedData));
+    if (!feeds) feeds = [];
 
     return {
-      artistProfile,
+      artistProfile: plainToInstance(ArtistDto, artistProfile),
       feeds,
     };
   }
@@ -131,7 +142,7 @@ export class CommunityService {
     comments = await this.getFeedCommentByFeedId(feedId);
 
     // 데이터 전처리
-    comments = await comments.forEach(this.processCommentData);
+    comments = await Promise.all(comments.map(this.processCommentData));
     if (!comments) comments = [];
 
     console.log(comments);
