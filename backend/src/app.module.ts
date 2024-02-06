@@ -17,25 +17,6 @@ import { FeedEntity } from './community/entity/feed.entity';
 import { UserProfileEntity } from './user/entity/user-profile.entity';
 import { UserInfoEntity } from './user/entity/user-info.entity';
 
-// 동적으로 import
-import('adminjs')
-  .then((AdminJS) => {
-    // adminjs/typeorm도 동적으로 import
-    import('@adminjs/typeorm')
-      .then((AdminJSTypeorm) => {
-        AdminJS.default.registerAdapter({
-          Resource: AdminJSTypeorm.Resource,
-          Database: AdminJSTypeorm.Database,
-        });
-      })
-      .catch((error) => {
-        console.error('Failed to import @adminjs/typeorm:', error);
-      });
-  })
-  .catch((error) => {
-    console.error('Failed to import adminjs:', error);
-  });
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,17 +38,25 @@ import('adminjs')
     MediaModule,
     import('@adminjs/nestjs').then(({ AdminModule }) =>
       AdminModule.createAdminAsync({
-        useFactory: () => ({
-          adminJsOptions: {
-            rootPath: '/api/admin',
-            resources: [
-              VoteEntity,
-              FeedEntity,
-              UserProfileEntity,
-              UserInfoEntity,
-            ],
-          },
-        }),
+        useFactory: async () => {
+          const { AdminJS } = await import('adminjs');
+          const AdminJSTypeorm = await import('@adminjs/typeorm');
+          AdminJS.registerAdapter({
+            Resource: AdminJSTypeorm.Resource,
+            Database: AdminJSTypeorm.Database,
+          });
+          return {
+            adminJsOptions: {
+              rootPath: '/api/admin',
+              resources: [
+                VoteEntity,
+                FeedEntity,
+                UserProfileEntity,
+                UserInfoEntity,
+              ],
+            },
+          };
+        },
       }),
     ),
   ],
