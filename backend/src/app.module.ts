@@ -12,6 +12,29 @@ import { StorageModule } from './storage/storage.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { MediaModule } from './media/media.module';
 import { HomeModule } from './home/home.module';
+import { VoteEntity } from './vote/entity/vote.entity';
+import { FeedEntity } from './community/entity/feed.entity';
+import { UserProfileEntity } from './user/entity/user-profile.entity';
+import { UserInfoEntity } from './user/entity/user-info.entity';
+
+// 동적으로 import
+import('adminjs')
+  .then((AdminJS) => {
+    // adminjs/typeorm도 동적으로 import
+    import('@adminjs/typeorm')
+      .then((AdminJSTypeorm) => {
+        AdminJS.default.registerAdapter({
+          Resource: AdminJSTypeorm.Resource,
+          Database: AdminJSTypeorm.Database,
+        });
+      })
+      .catch((error) => {
+        console.error('Failed to import @adminjs/typeorm:', error);
+      });
+  })
+  .catch((error) => {
+    console.error('Failed to import adminjs:', error);
+  });
 
 @Module({
   imports: [
@@ -37,7 +60,12 @@ import { HomeModule } from './home/home.module';
         useFactory: () => ({
           adminJsOptions: {
             rootPath: '/api/admin',
-            resources: [],
+            resources: [
+              VoteEntity,
+              FeedEntity,
+              UserProfileEntity,
+              UserInfoEntity,
+            ],
           },
         }),
       }),

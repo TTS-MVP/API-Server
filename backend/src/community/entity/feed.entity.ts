@@ -1,5 +1,6 @@
 import { UserProfileEntity } from 'src/user/entity/user-profile.entity';
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -13,7 +14,7 @@ import { CommentEntity } from './comment.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('feed', { database: 'tniverse' })
-export class FeedEntity {
+export class FeedEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 

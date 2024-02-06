@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user_info', { database: 'tniverse' })
-export class UserInfoEntity {
+export class UserInfoEntity extends BaseEntity {
   @PrimaryColumn({ type: 'int', unsigned: true, unique: false })
   id: number;
 

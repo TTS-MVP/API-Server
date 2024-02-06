@@ -88,8 +88,8 @@ export class UserService {
         nickName: formattedSocialData.nickname,
         thumbnailUrl: formattedSocialData.thumbnailUrl,
       };
-      await this.saveUserInfo(userInfo);
-      userProfileData = await this.saveUserProfile(userProfile);
+      await this.userInfoRepository.save(userInfo);
+      userProfileData = await this.userProfileRepository.save(userProfile);
     }
     // 유저가 존재하면 로그인
     else {
@@ -129,12 +129,14 @@ export class UserService {
     return userProfileData;
   }
 
-  async saveUserInfo(userInfo: UserInfoEntity) {
+  async saveUserInfo(userInfo: UserInfoEntity): Promise<UserInfoEntity> {
     const savedUserInfo = await this.userInfoRepository.save(userInfo);
     return savedUserInfo;
   }
 
-  async saveUserProfile(userProfile: UserProfileEntity) {
+  async saveUserProfile(
+    userProfile: UserProfileEntity,
+  ): Promise<UserProfileEntity> {
     const savedUserProfile = await this.userProfileRepository.save(userProfile);
     return savedUserProfile;
   }

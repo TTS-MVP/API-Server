@@ -1,6 +1,7 @@
 import { CommentEntity } from 'src/community/entity/comment.entity';
 import { FeedEntity } from 'src/community/entity/feed.entity';
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,7 +11,7 @@ import {
 } from 'typeorm';
 
 @Entity('user_profile', { database: 'tniverse' })
-export class UserProfileEntity {
+export class UserProfileEntity extends BaseEntity {
   @PrimaryColumn({ type: 'int', unsigned: true })
   id: number;
 

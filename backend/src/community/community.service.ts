@@ -15,6 +15,8 @@ import { CommentEntity } from './entity/comment.entity';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { StorageService } from 'src/storage/storage.service';
 import { plainToInstance } from 'class-transformer';
+import { CommentDto } from './dto/comment.dto';
+import { SummaryProfileDTO } from 'src/user/dto/profile.dto';
 
 @Injectable()
 export class CommunityService {
@@ -45,28 +47,20 @@ export class CommunityService {
     return transformedFeeds;
   }
 
-  private async processFeedData(feed: FeedEntity) {
-    delete feed.userId;
-    delete feed.favoriteArtistId;
-    delete feed.status;
-    if (feed.userProfile) {
-      feed.userProfile = {
-        id: feed.userProfile.id,
-        nickName: feed.userProfile.nickName,
-        thumbnailUrl: feed.userProfile.thumbnailUrl,
-      };
-    }
+  private async processFeedData(feed) {
+    let transformedFeed = plainToInstance(FeedDto, feed);
+    transformedFeed = {
+      ...transformedFeed,
+      userProfile: plainToInstance(
+        SummaryProfileDTO,
+        transformedFeed.userProfile,
+      ),
+    };
+    return transformedFeed;
   }
 
   private async processCommentData(comment: CommentEntity) {
-    delete comment.userId;
-    delete comment.feedId;
-    delete comment.status;
-    comment.userProfile = {
-      id: comment.userProfile.id,
-      nickName: comment.userProfile.nickName,
-      thumbnailUrl: comment.userProfile.thumbnailUrl,
-    };
+    return plainToInstance(CommentDto, comment);
   }
 
   private async createFeedQueryBuilder(
@@ -83,7 +77,7 @@ export class CommunityService {
       .orderBy('feed.createdAt', 'DESC');
   }
 
-  private async getFeeds(favoriteArtistId: number): Promise<FeedDto[]> {
+  private async getFeeds(favoriteArtistId: number) {
     const feedQueryBuilder = await this.createFeedQueryBuilder(
       favoriteArtistId,
       1, // status: 1
@@ -91,7 +85,7 @@ export class CommunityService {
     return feedQueryBuilder.getMany();
   }
 
-  async getFeed(userId: number): Promise<FeedsDto> {
+  async getFeed(userId: number) {
     const userInfo = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userInfo?.favoriteArtistId;
     if (!favoriteArtistId)
@@ -130,14 +124,17 @@ export class CommunityService {
     if (!feed) throw new GlobalException('존재하지 않는 피드입니다.', 404);
 
     // 데이터 전처리
-    this.processFeedData(feed);
+    feed = await this.processFeedData(feed);
 
     // 피드의 댓글을 가져온다.
-    const comments = await this.getFeedCommentByFeedId(feedId);
+    let comments;
+    comments = await this.getFeedCommentByFeedId(feedId);
 
     // 데이터 전처리
-    comments.forEach(this.processCommentData);
+    comments = await comments.forEach(this.processCommentData);
+    if (!comments) comments = [];
 
+    console.log(comments);
     return {
       ...feed,
       comments,

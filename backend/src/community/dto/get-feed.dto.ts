@@ -1,14 +1,8 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ArtistDto } from 'src/artist/dto/artist.dto';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CommentDto } from './comment.dto';
 import { Exclude, Expose } from 'class-transformer';
-
-class UserProfileDto extends OmitType(CreateUserDto, [
-  'favoriteArtistId',
-] as const) {
-  // UserProfileDto에 대한 추가적인 속성들...
-}
+import { SummaryProfileDTO, UserProfileDTO } from 'src/user/dto/profile.dto';
 
 export class FeedDto {
   @Expose()
@@ -42,8 +36,8 @@ export class FeedDto {
   updatedAt?: Date;
 
   @Expose()
-  @ApiProperty({ type: UserProfileDto })
-  userProfile?: UserProfileDto;
+  @ApiProperty({ type: SummaryProfileDTO })
+  userProfile?: SummaryProfileDTO;
 
   @Exclude()
   userId?: number;
@@ -71,7 +65,7 @@ export class summaryFeedDto extends OmitType(FeedDto, [
   updatedAt?: Date;
 
   @Exclude()
-  userProfile?: UserProfileDto;
+  userProfile?: UserProfileDTO;
 }
 
 export class FeedsDto {

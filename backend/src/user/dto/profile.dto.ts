@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 import { ArtistDto } from 'src/artist/dto/artist.dto';
+import { Exclude } from 'class-transformer';
 
 export class ProfileDTO extends OmitType(CreateUserDto, ['favoriteArtistId']) {
   @ApiProperty({
@@ -31,4 +32,20 @@ export class UserProfileDTO {
 
   @ApiProperty({ type: () => ArtistDto })
   favoriteArtistProfile: ArtistDto;
+}
+
+export class SummaryProfileDTO extends OmitType(CreateUserDto, [
+  'favoriteArtistId',
+]) {
+  @Exclude()
+  registedAt: Date;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+
+  @Exclude()
+  favoriteArtistId: number;
 }

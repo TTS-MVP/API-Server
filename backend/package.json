@@ -28,6 +28,7 @@
   "dependencies": {
     "@adminjs/express": "^6.1.0",
     "@adminjs/nestjs": "^6.1.0",
+    "@adminjs/typeorm": "^5.0.0",
     "@google-cloud/storage": "^7.7.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.1.1",
