@@ -26,6 +26,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@adminjs/express": "^6.1.0",
+    "@adminjs/nestjs": "^6.1.0",
     "@google-cloud/storage": "^7.7.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.1.1",
@@ -33,11 +35,14 @@
     "@nestjs/platform-express": "^9.4.3",
     "@nestjs/swagger": "^7.1.16",
     "@nestjs/typeorm": "^9.0.1",
+    "adminjs": "^7.5.9",
     "axios": "^1.6.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "date-fns-tz": "^2.0.0",
     "dotenv": "^16.3.1",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.2.0",
     "reflect-metadata": "^0.1.13",
@@ -68,7 +73,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.2.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.3"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -85,6 +90,7 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "type": "module"
   }
 }

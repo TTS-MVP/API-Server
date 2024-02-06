@@ -32,6 +32,16 @@ import { HomeModule } from './home/home.module';
     StorageModule,
     ScheduleModule,
     MediaModule,
+    import('@adminjs/nestjs').then(({ AdminModule }) =>
+      AdminModule.createAdminAsync({
+        useFactory: () => ({
+          adminJsOptions: {
+            rootPath: '/api/admin',
+            resources: [],
+          },
+        }),
+      }),
+    ),
   ],
   controllers: [AppController],
   providers: [AppService],
