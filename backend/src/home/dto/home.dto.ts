@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { summaryFeedDto } from 'src/community/dto/get-feed.dto';
 import { SummaryVideoDTO } from 'src/media/dto/media.dto';
+import { ScheduleDto } from 'src/schedule/dto/schedule.dto';
 import { MonthlyArtistSummaryDto } from 'src/vote/dto/vote.dto';
 
 export class homeDTO {
@@ -12,9 +13,9 @@ export class homeDTO {
 
   @ApiProperty({
     description: '일정',
-    type: [String],
+    type: ScheduleDto,
   })
-  schedules: [];
+  schedules: ScheduleDto;
 
   @ApiProperty({
     description:

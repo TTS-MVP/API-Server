@@ -1,4 +1,5 @@
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ScheduleDto } from '../dto/schedule.dto';
 
 export const ApiGetRecentSchedules = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -49,6 +50,7 @@ export const ApiGetSchedules = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 일정을 가져왔을 때의 응답',
+      type: ScheduleDto,
     })(target, key, descriptor);
 
     ApiResponse({
