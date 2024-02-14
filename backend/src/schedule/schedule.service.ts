@@ -109,6 +109,12 @@ export class ScheduleService {
       5,
     );
 
-    return schedules;
+    schedules.forEach((schedule) => {
+      schedule.type = this.formatScheduleType(schedule.type) as any;
+    });
+
+    const groupedSchedules = this.groupSchedulesByDate(schedules);
+
+    return groupedSchedules;
   }
 }
