@@ -32,7 +32,7 @@ export class ScheduleService {
     endDate: Date,
     limit?: number,
   ): Promise<ScheduleEntity[]> {
-    return this.scheduleRepository.find({
+    let schedules = this.scheduleRepository.find({
       select: ['type', 'startAt', 'content'],
       where: {
         artistId,
@@ -43,6 +43,32 @@ export class ScheduleService {
       },
       take: limit,
     });
+
+    // 오늘 데이터가 적으면 지난 일정 중 추가로 가져오기
+    schedules = schedules.then((schedules) => {
+      if (schedules.length < limit) {
+        const todayDate = new Date(startDate);
+        todayDate.setHours(0, 0, 0, 0);
+        return this.scheduleRepository
+          .find({
+            select: ['type', 'startAt', 'content'],
+            where: {
+              artistId,
+              startAt: Between(todayDate, startDate),
+            },
+            order: {
+              startAt: 'DESC',
+            },
+            take: limit - schedules.length,
+          })
+          .then((prevSchedules) => {
+            return [...prevSchedules, ...schedules];
+          });
+      }
+      return schedules;
+    });
+
+    return schedules;
   }
 
   private groupSchedulesByDate(schedules: ScheduleEntity[]) {
@@ -98,7 +124,6 @@ export class ScheduleService {
     }
 
     const startDate = convertToSeoulTimezone(new Date());
-    startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 2);
 
