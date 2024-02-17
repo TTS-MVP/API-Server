@@ -16,6 +16,27 @@ import { VoteEntity } from './vote/entity/vote.entity';
 import { FeedEntity } from './community/entity/feed.entity';
 import { UserProfileEntity } from './user/entity/user-profile.entity';
 import { UserInfoEntity } from './user/entity/user-info.entity';
+import { CommentEntity } from './community/entity/comment.entity';
+import { VoteAcquisitionHistoryEntity } from './vote/entity/vote-acquisition-history.entity';
+import { ArtistEntity } from './artist/entity/artist.entity';
+import { ScheduleEntity } from './schedule/entity/schedule.entity';
+
+const userSidebar = {
+  name: '유저',
+  icon: 'Accessibility',
+};
+const voteSidebar = {
+  name: '투표',
+  icon: 'Accessibility',
+};
+const communitySidebar = {
+  name: '커뮤니티',
+  icon: 'Accessibility',
+};
+const scheduleSidebar = {
+  name: '일정',
+  icon: 'Accessibility',
+};
 
 @Module({
   imports: [
@@ -49,10 +70,66 @@ import { UserInfoEntity } from './user/entity/user-info.entity';
             adminJsOptions: {
               rootPath: '/api/admin',
               resources: [
-                VoteEntity,
-                FeedEntity,
-                UserProfileEntity,
-                UserInfoEntity,
+                // 유저
+                {
+                  resource: UserProfileEntity,
+                  options: {
+                    parent: userSidebar,
+                  },
+                },
+                {
+                  resource: UserInfoEntity,
+                  options: {
+                    parent: userSidebar,
+                  },
+                },
+                {
+                  resource: ArtistEntity,
+                  options: {
+                    parent: userSidebar,
+                  },
+                },
+                // 투표
+                {
+                  resource: VoteEntity,
+                  options: {
+                    parent: voteSidebar,
+                  },
+                },
+                {
+                  resource: VoteAcquisitionHistoryEntity,
+                  options: {
+                    parent: voteSidebar,
+                  },
+                },
+                // 커뮤니티
+                {
+                  resource: FeedEntity,
+                  options: {
+                    parent: communitySidebar,
+                    sort: {
+                      sortBy: 'createdAt',
+                      direction: 'desc',
+                    },
+                  },
+                },
+                {
+                  resource: CommentEntity,
+                  options: {
+                    parent: communitySidebar,
+                    sort: {
+                      sortBy: 'createdAt',
+                      direction: 'desc',
+                    },
+                  },
+                },
+                // 일정
+                {
+                  resource: ScheduleEntity,
+                  options: {
+                    parent: scheduleSidebar,
+                  },
+                },
               ],
             },
           };

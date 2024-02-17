@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -6,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Entity('vote_acquisition_history', { database: 'tniverse' })
-export class VoteAcquisitionHistoryEntity {
+export class VoteAcquisitionHistoryEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 

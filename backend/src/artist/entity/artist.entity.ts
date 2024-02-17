@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('artist', { database: 'tniverse' })
-export class ArtistEntity {
+export class ArtistEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
