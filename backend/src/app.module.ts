@@ -23,19 +23,15 @@ import { ScheduleEntity } from './schedule/entity/schedule.entity';
 
 const userSidebar = {
   name: '유저',
-  icon: 'Accessibility',
 };
 const voteSidebar = {
   name: '투표',
-  icon: 'Accessibility',
 };
 const communitySidebar = {
   name: '커뮤니티',
-  icon: 'Accessibility',
 };
 const scheduleSidebar = {
   name: '일정',
-  icon: 'Accessibility',
 };
 
 @Module({
@@ -72,13 +68,13 @@ const scheduleSidebar = {
               resources: [
                 // 유저
                 {
-                  resource: UserProfileEntity,
+                  resource: UserInfoEntity,
                   options: {
                     parent: userSidebar,
                   },
                 },
                 {
-                  resource: UserInfoEntity,
+                  resource: UserProfileEntity,
                   options: {
                     parent: userSidebar,
                   },
