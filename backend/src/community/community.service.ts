@@ -48,6 +48,14 @@ export class CommunityService {
     return transformedFeeds;
   }
 
+  private async getCommentCount(feed): Promise<number> {
+    // Assuming getCommentById is an asynchronous function
+    const comments = await Promise.all(
+      feed.comments.map((commentId) => this.getCommentById(feed.id)),
+    );
+    return comments.length;
+  }
+
   private async processFeedData(feed): Promise<FeedDto> {
     let transformedFeed = plainToInstance(FeedDto, feed);
     transformedFeed = {
@@ -79,6 +87,7 @@ export class CommunityService {
     return this.feedRepository
       .createQueryBuilder('feed')
       .innerJoinAndSelect('feed.userProfile', 'userProfile')
+      .innerJoinAndSelect('feed.comments', 'comments')
       .where('feed.status = :status', { status })
       .andWhere('feed.favoriteArtistId = :favoriteArtistId', {
         favoriteArtistId,
@@ -91,6 +100,7 @@ export class CommunityService {
       favoriteArtistId,
       1, // status: 1
     );
+
     return feedQueryBuilder.getMany();
   }
 
@@ -107,9 +117,16 @@ export class CommunityService {
     let feeds;
     feeds = await this.getFeeds(favoriteArtistId);
 
-    // 데이터 전처리
-    feeds = await Promise.all(feeds.map(this.processFeedData));
     if (!feeds) feeds = [];
+    // 데이터 전처리
+    feeds = await Promise.all(
+      feeds.map(async (feed) => {
+        const commentCount = await this.getCommentCount(feed);
+        feed.commentCount = commentCount;
+        delete feed.comments;
+        return this.processFeedData(feed);
+      }),
+    );
 
     return {
       artistProfile: plainToInstance(ArtistDto, artistProfile),
@@ -140,12 +157,12 @@ export class CommunityService {
     // 피드의 댓글을 가져온다.
     let comments;
     comments = await this.getFeedCommentByFeedId(feedId);
+    if (!comments) comments = [];
+    feed.commentCount = comments.length;
 
     // 데이터 전처리
     comments = await Promise.all(comments.map(this.processCommentData));
-    if (!comments) comments = [];
 
-    console.log(comments);
     return {
       ...feed,
       comments,

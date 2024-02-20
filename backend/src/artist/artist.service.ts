@@ -24,8 +24,7 @@ export class ArtistService {
         thumbnailUrl,
       }));
     } catch (error) {
-      console.log(error);
-      throw new GlobalException('데이터베이스 오류', 500);
+      throw new GlobalException('존재하지 않는 아티스트입니다.', 404);
     }
   }
 

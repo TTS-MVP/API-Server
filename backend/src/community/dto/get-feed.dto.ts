@@ -28,6 +28,10 @@ export class FeedDto {
   likeCount?: number;
 
   @Expose()
+  @ApiProperty({ default: 0, description: '댓글의 좋아요 수' })
+  commentCount?: number;
+
+  @Expose()
   @ApiProperty({ description: '피드 작성 시간' })
   createdAt?: Date;
 
@@ -77,6 +81,7 @@ export class FeedsDto {
 }
 
 export class DetailFeedDto extends FeedDto {
+  @Expose()
   @ApiProperty({ type: [CommentDto] })
   comments: CommentDto[];
 }
