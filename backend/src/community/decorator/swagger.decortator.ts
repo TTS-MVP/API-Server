@@ -5,9 +5,14 @@ import {
   ApiParam,
   ApiProperty,
   ApiResponse,
+  OmitType,
 } from '@nestjs/swagger';
 import { DetailFeedDto, FeedsDto } from '../dto/get-feed.dto';
-import { CreateFeedDto } from '../dto/create-feed.dto';
+import {
+  CreateCommentDto,
+  DeleteCommentResponseDto,
+} from '../dto/create-comment.dto';
+import { CommentDto } from '../dto/comment.dto';
 
 export const ApiGetFeed = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -183,6 +188,7 @@ export const ApiCreateComment = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 댓글을 생성했을 때의 응답',
+      type: CreateCommentDto,
     })(target, key, descriptor);
 
     ApiResponse({
@@ -214,6 +220,7 @@ export const ApiUpdateComment = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 댓글을 수정했을 때의 응답',
+      type: OmitType(CommentDto, ['userProfile']),
     })(target, key, descriptor);
 
     ApiResponse({
@@ -250,6 +257,7 @@ export const ApiDeleteComment = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 댓글을 삭제했을 때의 응답',
+      type: DeleteCommentResponseDto,
     })(target, key, descriptor);
 
     ApiResponse({

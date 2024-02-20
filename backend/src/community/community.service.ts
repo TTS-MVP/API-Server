@@ -262,12 +262,18 @@ export class CommunityService {
   async createComment(feedId: number, userId: number, content: string) {
     try {
       // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
-      await this.getFeedById(feedId);
-      await this.commentRepository.save({
+      const feed = await this.getFeedById(feedId);
+      const commentCount = await this.getCommentCount(feed);
+      const comment = await this.commentRepository.save({
         feedId,
         userId,
         content,
       });
+      const transformedComment = plainToInstance(CommentDto, comment);
+      return {
+        commentCount: commentCount + 1,
+        comment: transformedComment,
+      };
     } catch (error) {
       if (error instanceof GlobalException) throw error;
       throw new GlobalException('댓글 생성에 실패했습니다.', 400);
@@ -278,20 +284,29 @@ export class CommunityService {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId, status: 1 },
     });
-    if (!comment)
-      throw new GlobalException('존재하지 않거나 삭제된 댓글입니다.', 404);
+    if (!comment) return undefined;
     return comment;
   }
 
-  async updateComment(commentId: number, userId: number, content: string) {
+  async updateComment(
+    commentId: number,
+    userId: number,
+    content: string,
+  ): Promise<CommentDto> {
     try {
       // 댓글이 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
       const comment = await this.getCommentById(commentId);
       if (comment?.userId !== userId)
         throw new GlobalException('댓글 수정 권한이 없습니다.', 403);
-      await this.commentRepository.update(commentId, {
+      const updatedComment = await this.commentRepository.update(commentId, {
         content,
       });
+      if (updatedComment.affected > 0) {
+        const updatedComment = await this.commentRepository.findOne({
+          where: { id: commentId },
+        });
+        return plainToInstance(CommentDto, updatedComment);
+      }
     } catch (error) {
       if (error instanceof GlobalException) throw error;
       throw new GlobalException('댓글 수정에 실패했습니다.', 400);
@@ -302,9 +317,15 @@ export class CommunityService {
     try {
       // 댓글이 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
       const comment = await this.getCommentById(commentId);
+      if (comment.status != 1)
+        throw new GlobalException('존재하지 않는 댓글입니다.', 404);
       if (comment?.userId !== userId)
         throw new GlobalException('댓글 삭제 권한이 없습니다.', 403);
       await this.commentRepository.update(commentId, { status: 2 });
+      const feed = await this.getFeedById(comment.feedId);
+      if (!feed) throw new GlobalException('존재하지 않는 글입니다.', 404);
+      const commentCount = await this.getCommentCount(feed);
+      return commentCount;
     } catch (error) {
       if (error instanceof GlobalException) throw error;
       throw new GlobalException('댓글 삭제에 실패했습니다.', 400);

@@ -29,7 +29,12 @@ import {
 } from './decorator/swagger.decortator';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import {
+  CreateCommentDto,
+  CreateCommentResponseDto,
+  DeleteCommentResponseDto,
+} from './dto/create-comment.dto';
+import { CommentDto } from './dto/comment.dto';
 
 @ApiTags('커뮤니티')
 @UseGuards(AuthGuard)
@@ -109,16 +114,16 @@ export class CommunityController {
     @Param('feedId') feedId: number,
     @Req() request: Request,
     @Body() createCommentDto: CreateCommentDto,
-  ) {
+  ): Promise<ResponseDto<CreateCommentResponseDto>> {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
     const { content } = createCommentDto;
-    const feed = await this.communityService.createComment(
+    const result = await this.communityService.createComment(
       feedId,
       userId,
       content,
     );
-    return new ResponseDto(true, 200, '댓글 생성 성공', feed);
+    return new ResponseDto(true, 200, '댓글 생성 성공', result);
   }
 
   @ApiUpdateComment()
@@ -127,16 +132,16 @@ export class CommunityController {
     @Param('commentId') commentId: number,
     @Req() request: Request,
     @Body() createCommentDto: CreateCommentDto,
-  ) {
+  ): Promise<ResponseDto<CommentDto>> {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
     const { content } = createCommentDto;
-    const feed = await this.communityService.updateComment(
+    const comment = await this.communityService.updateComment(
       commentId,
       userId,
       content,
     );
-    return new ResponseDto(true, 200, '댓글 수정 성공', feed);
+    return new ResponseDto(true, 200, '댓글 수정 성공', comment);
   }
 
   @ApiDeleteComment()
@@ -144,11 +149,14 @@ export class CommunityController {
   async deleteComment(
     @Param('commentId') commentId: number,
     @Req() request: Request,
-  ) {
+  ): Promise<ResponseDto<DeleteCommentResponseDto>> {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
-    const feed = await this.communityService.deleteComment(commentId, userId);
-    return new ResponseDto(true, 200, '댓글 삭제 성공');
+    const commentCount = await this.communityService.deleteComment(
+      commentId,
+      userId,
+    );
+    return new ResponseDto(true, 200, '댓글 삭제 성공', { commentCount });
   }
 
   // TODO: 좋아요 하기
