@@ -49,10 +49,7 @@ export class CommunityService {
   }
 
   private async getCommentCount(feed): Promise<number> {
-    // Assuming getCommentById is an asynchronous function
-    const comments = await Promise.all(
-      feed.comments.map((commentId) => this.getCommentById(feed.id)),
-    );
+    const comments = await this.getFeedCommentByFeedId(feed.id);
     return comments.length;
   }
 
@@ -86,8 +83,8 @@ export class CommunityService {
   ): Promise<SelectQueryBuilder<FeedEntity>> {
     return this.feedRepository
       .createQueryBuilder('feed')
-      .innerJoinAndSelect('feed.userProfile', 'userProfile')
-      .innerJoinAndSelect('feed.comments', 'comments')
+      .leftJoinAndSelect('feed.userProfile', 'userProfile')
+      .leftJoinAndSelect('feed.comments', 'comments')
       .where('feed.status = :status', { status })
       .andWhere('feed.favoriteArtistId = :favoriteArtistId', {
         favoriteArtistId,
@@ -116,6 +113,7 @@ export class CommunityService {
 
     let feeds;
     feeds = await this.getFeeds(favoriteArtistId);
+    console.log(feeds);
 
     if (!feeds) feeds = [];
     // 데이터 전처리
