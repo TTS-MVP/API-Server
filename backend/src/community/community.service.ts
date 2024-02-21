@@ -334,12 +334,6 @@ export class CommunityService {
     try {
       // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
       const feed = await this.getFeedById(feedId);
-      // 글 작성자가 누르는 경우
-      if (feed?.userProfile?.id === userId)
-        throw new GlobalException(
-          '자신의 글에는 좋아요를 누를 수 없습니다.',
-          403,
-        );
       await this.feedRepository.update(feedId, {
         likeCount: feed.likeCount + 1,
       });
@@ -354,12 +348,6 @@ export class CommunityService {
     try {
       // 피드가 존재하는지 확인하고, 삭제되지 않았는지 확인한다.
       const feed = await this.getFeedById(feedId);
-      // 글 작성자가 누르는 경우
-      if (feed?.userProfile?.id === userId)
-        throw new GlobalException(
-          '자신의 글에는 좋아요를 누를 수 없습니다.',
-          403,
-        );
       await this.feedRepository.update(feedId, {
         likeCount: feed.likeCount - 1,
       });
