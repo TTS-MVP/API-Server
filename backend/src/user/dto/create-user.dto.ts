@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { IsInt, IsString } from 'class-validator';
+import { IsInt, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @Expose()
@@ -8,7 +8,7 @@ export class CreateUserDto {
     example: 3261524388,
     description: '유저 고유 식별자',
   })
-  @IsInt()
+  @IsNumberString()
   id: number;
 
   @Expose()
@@ -24,15 +24,21 @@ export class CreateUserDto {
     example:
       'http://k.kakaocdn.net/dn/xY7RN/btsv7uJYMhj/8bWKP7mb2EelLW9JfevYc0/img_110x110.jpg',
     description: '유저 프로필 사진',
+    required: false,
   })
+  @IsOptional()
   @IsString()
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
 
   @Expose()
   @ApiProperty({
     example: 1,
     description: '최애 아티스트 고유 식별자',
   })
-  @IsInt()
+  @IsNumberString()
   favoriteArtistId: number;
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
+  imageFile?: Express.Multer.File;
 }

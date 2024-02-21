@@ -5,7 +5,9 @@ import {
   HttpCode,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -21,6 +23,7 @@ import { AuthGuard } from 'src/auth/auth-guard.service';
 import { VoteService } from 'src/vote/vote.service';
 import { ApiVote } from 'src/vote/decorator/swagger.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('유저')
 @Controller('user')
@@ -49,8 +52,12 @@ export class UserController {
 
   @ApiRegister()
   @Post('register')
-  async register(@Body() userProfile: CreateUserDto) {
-    await this.userService.register(userProfile);
+  @UseInterceptors(FileInterceptor('imageFile'))
+  async register(
+    @Body() userProfile: CreateUserDto,
+    @UploadedFile() imageFile?: Express.Multer.File,
+  ) {
+    await this.userService.register(userProfile, imageFile);
     return new ResponseDto(true, 201, '회원가입 성공');
   }
 

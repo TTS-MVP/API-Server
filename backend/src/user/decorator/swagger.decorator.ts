@@ -1,4 +1,4 @@
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   isExistUserLoginDto,
   isNotExistUserLoginDto,
@@ -43,6 +43,8 @@ export const ApiLogin = () => {
 
 export const ApiRegister = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiConsumes('multipart/form-data')(target, key, descriptor);
+
     ApiOperation({
       summary: '회원가입',
       description: `회원가입을 한다.`,

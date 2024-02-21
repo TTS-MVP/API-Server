@@ -9,12 +9,14 @@ import { UserProfileEntity } from './entity/user-profile.entity';
 import { ArtistService } from 'src/artist/artist.service';
 import { VoteService } from 'src/vote/vote.service';
 import { UserProfileDTO } from './dto/profile.dto';
+import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly authKakaoService: AuthKakaoService,
     private readonly authService: AuthService,
+    private readonly storageService: StorageService,
     private readonly artistService: ArtistService,
     @Inject(forwardRef(() => VoteService))
     private readonly voteService: VoteService,
@@ -23,15 +25,40 @@ export class UserService {
     @InjectRepository(UserProfileEntity)
     private readonly userProfileRepository: Repository<UserProfileEntity>,
   ) {}
-  async register(userProfile) {
+  async register(userProfile, imageFile) {
     const isExistUser = await this.getUserInfoByUserId(userProfile.id);
     if (!isExistUser) {
       throw new GlobalException(
         '존재하지 않는 사용자입니다. id값을 다시 확인해주세요.',
         400,
       );
+    }
+    let user = await this.getUserProfileByUserId(userProfile.id);
+    // 기존 사진이 존재하면 삭제한다.
+    if (
+      user &&
+      user.thumbnailUrl.startsWith('https://storage.googleapis.com')
+    ) {
+      await this.storageService.deleteImageByUrl(user.thumbnailUrl);
+    }
+    if (imageFile) {
+      try {
+        const path = `user/${userProfile.id}`;
+        // 이미지를 저장한다.
+        const imageUrl = await this.storageService.saveImage(path, imageFile);
+        userProfile.thumbnailUrl = imageUrl;
+      } catch (err) {
+        throw new GlobalException('프로필 사진 저장에 실패했습니다.', 500);
+      }
+    } else if (userProfile.thumbnailUrl) {
     } else {
-      await this.saveUserProfile(userProfile);
+      userProfile.thumbnailUrl =
+        'https://storage.googleapis.com/tniverse-seoul-dev-storage-01/base-image.png';
+    }
+    delete userProfile.imageFile;
+    if (!user) await this.saveUserProfile(userProfile);
+    else {
+      await this.updateUserProfile(userProfile);
     }
   }
   async login(socialLoginType: number, kakaoAccessToken: string) {
@@ -139,6 +166,10 @@ export class UserService {
   ): Promise<UserProfileEntity> {
     const savedUserProfile = await this.userProfileRepository.save(userProfile);
     return savedUserProfile;
+  }
+
+  async updateUserProfile(userProfile: UserProfileEntity) {
+    await this.userProfileRepository.update(userProfile.id, userProfile);
   }
 
   async getProfile(userId: number): Promise<UserProfileDTO> {

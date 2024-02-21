@@ -7,12 +7,14 @@ import { UserProfileEntity } from './entity/user-profile.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { VoteModule } from 'src/vote/vote.module';
 import { ArtistModule } from 'src/artist/artist.module';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserInfoEntity, UserProfileEntity]),
     AuthModule,
     ArtistModule,
+    StorageModule,
     forwardRef(() => VoteModule),
   ],
   controllers: [UserController],
