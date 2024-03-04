@@ -103,6 +103,21 @@ export class CommunityService {
     return feedQueryBuilder.getMany();
   }
 
+  // 오늘 작성한 글 수 조회
+  private async getFeedCountByUser(userId: number): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const feedCount = await this.feedRepository.count({
+      where: {
+        userId,
+        createdAt: Between(today, tomorrow),
+      },
+    });
+    return feedCount;
+  }
+
   async getFeed(userId: number): Promise<FeedsDto> {
     const userInfo = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userInfo?.favoriteArtistId;
@@ -208,6 +223,13 @@ export class CommunityService {
         favoriteArtistId,
         userId,
       });
+      // TODO: 일일 미션 커뮤니티 글 쓰기 (하루 최대 3회)
+      let isClearMission = false;
+      if ((await this.getFeedCountByUser(userId)) <= 3) {
+        await this.voteService.recordedVoteAcquisitionHistory(userId, 10, 4);
+        isClearMission = true;
+      }
+      return { isClearMission };
     } catch (error) {
       throw new GlobalException('피드 생성에 실패했습니다.', 400);
     }
