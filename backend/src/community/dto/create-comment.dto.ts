@@ -11,6 +11,9 @@ export class CreateCommentDto {
 }
 
 export class CreateCommentResponseDto {
+  @ApiProperty({ description: '미션 클리어 여부', example: true })
+  isClearMission: boolean;
+
   @ApiProperty({ description: '작성된 댓글의 수', example: '3' })
   commentCount?: number;
 
@@ -23,5 +26,5 @@ export class CreateCommentResponseDto {
 
 export class DeleteCommentResponseDto extends OmitType(
   CreateCommentResponseDto,
-  ['comment'],
+  ['comment', 'isClearMission'],
 ) {}

@@ -12,6 +12,7 @@ import { VoteEntity } from './entity/vote.entity';
 import { MonthlyArtistSummaryDto, VoteResultDto } from './dto/vote.dto';
 import { ArtistService } from 'src/artist/artist.service';
 import { plainToInstance } from 'class-transformer';
+import { VoteAcquisitionHistoryEntity } from './entity/vote-acquisition-history.entity';
 
 @Injectable()
 export class VoteService {
@@ -24,6 +25,8 @@ export class VoteService {
     private artistFanCountRepository: Repository<UserVoteCountView>,
     @InjectRepository(VoteEntity)
     private voteRepository: Repository<VoteEntity>,
+    @InjectRepository(VoteAcquisitionHistoryEntity)
+    private voteAcquisitionHistoryRepository: Repository<VoteAcquisitionHistoryEntity>,
     private artistService: ArtistService,
     private userService: UserService,
   ) {}
@@ -225,5 +228,25 @@ export class VoteService {
 
     // Return the rank (1-based index)
     return rank + 1;
+  }
+
+  // 투표권 획득 히스토리 기록
+  async recordedVoteAcquisitionHistory(
+    userId: number,
+    voteCount: number,
+    type: number,
+  ) {
+    try {
+      await this.voteAcquisitionHistoryRepository.save({
+        userId,
+        voteCount,
+        type,
+      });
+    } catch (error) {
+      throw new GlobalException(
+        '투표권 획득 히스토리 기록에 실패했습니다.',
+        400,
+      );
+    }
   }
 }

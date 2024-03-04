@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeedEntity } from './entity/feed.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Between, Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { GlobalException } from 'src/common/dto/response.dto';
 import { ArtistService } from 'src/artist/artist.service';
@@ -18,6 +18,7 @@ import { plainToInstance } from 'class-transformer';
 import { CommentDto } from './dto/comment.dto';
 import { SummaryProfileDTO } from 'src/user/dto/profile.dto';
 import { ArtistDto } from 'src/artist/dto/artist.dto';
+import { VoteService } from 'src/vote/vote.service';
 
 @Injectable()
 export class CommunityService {
@@ -29,6 +30,7 @@ export class CommunityService {
     private readonly userService: UserService,
     private readonly artistService: ArtistService,
     private readonly storageService: StorageService,
+    private readonly voteService: VoteService,
   ) {}
 
   async getHotFeeds(): Promise<summaryFeedDto[]> {
@@ -256,6 +258,21 @@ export class CommunityService {
     }
   }
 
+  // 사용자 오늘 작성한 댓글 수 조회
+  async getCommentCountByUser(userId: number): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const commentCount = await this.commentRepository.count({
+      where: {
+        userId,
+        createdAt: Between(today, tomorrow),
+      },
+    });
+    return commentCount;
+  }
+
   // 댓글
   async createComment(feedId: number, userId: number, content: string) {
     try {
@@ -267,8 +284,15 @@ export class CommunityService {
         userId,
         content,
       });
+      // TODO: 일일 미션 커뮤니티 댓글 쓰기 (하루 최대 5회)
+      let isClearMission = false;
+      if ((await this.getCommentCountByUser(userId)) <= 5) {
+        await this.voteService.recordedVoteAcquisitionHistory(userId, 1, 3);
+        isClearMission = true;
+      }
       const transformedComment = plainToInstance(CommentDto, comment);
       return {
+        isClearMission,
         commentCount: commentCount + 1,
         comment: transformedComment,
       };
