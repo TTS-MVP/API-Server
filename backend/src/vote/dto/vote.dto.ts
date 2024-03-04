@@ -12,6 +12,12 @@ export class VoteInfo {
 
 export class VoteResultDto {
   @ApiProperty({
+    example: true,
+    description: '일일 미션 클리어 여부',
+  })
+  isClearMission: boolean;
+
+  @ApiProperty({
     example: 1,
     description: '투표권 사용 개수',
   })

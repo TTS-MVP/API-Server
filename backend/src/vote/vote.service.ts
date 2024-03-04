@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { MonthlyArtistVoteView } from './entity/monthly-artist-vote.view';
 import { MonthlyFanVoteView } from './entity/monthly-fan-vote.view';
 import { UserService } from 'src/user/user.service';
@@ -153,6 +153,21 @@ export class VoteService {
     return Number(vote.voteCount);
   }
 
+  // 오늘 투표한 횟수 조회
+  async getUserVoteCountById(userId: number): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const voteCount = await this.voteRepository.count({
+      where: {
+        userId: userId,
+        createdAt: Between(today, tomorrow),
+      },
+    });
+    return voteCount;
+  }
+
   async voteArtist(userId: number, voteCount: number): Promise<VoteResultDto> {
     // 유저 최애 아티스트 아이디 조회
     let userFavoriteArtistId = (
@@ -167,7 +182,7 @@ export class VoteService {
     }
 
     // 보유 투표권 개수 조회
-    const remainVoteCount = await this.getUserVoteById(userId);
+    let remainVoteCount = await this.getUserVoteById(userId);
     if (remainVoteCount < voteCount) {
       throw new GlobalException(
         '보유한 투표권 개수보다 많은 투표를 시도했습니다.',
@@ -184,12 +199,18 @@ export class VoteService {
     }
 
     // 투표하기
+    let isClearMission = false;
     try {
       this.voteRepository.save({
         artistId: userFavoriteArtistId,
         userId: userId,
         voteCount: voteCount,
       });
+      // 일일 미션 투표하기 (하루 1회)
+      if ((await this.getUserVoteCountById(userId)) === 0) {
+        await this.recordedVoteAcquisitionHistory(userId, 2, 0);
+        isClearMission = true;
+      }
     } catch (error) {
       throw new GlobalException('투표에 실패했습니다.', 400);
     }
@@ -199,11 +220,14 @@ export class VoteService {
       userId,
       userFavoriteArtistId,
     );
+    // 남은 투표권 개수 조회
+    remainVoteCount = await this.getUserVoteById(userId);
 
     // 결과 출력
     const result = {
+      isClearMission,
       voteCount,
-      remainVoteCount: remainVoteCount - voteCount,
+      remainVoteCount,
       month: new Date().getMonth() + 1,
       artistName,
       rank: fanContribution,
