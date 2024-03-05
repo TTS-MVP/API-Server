@@ -13,3 +13,8 @@ export class CreateFeedDto {
   @IsOptional()
   imageFile?: Express.Multer.File;
 }
+
+export class CreateFeedResponseDto {
+  @ApiProperty({ example: true, description: '미션 성공 여부' })
+  isClearMission: boolean;
+}

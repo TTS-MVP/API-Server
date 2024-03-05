@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { ArtistModule } from 'src/artist/artist.module';
 import { CommentEntity } from './entity/comment.entity';
 import { StorageModule } from 'src/storage/storage.module';
+import { VoteModule } from 'src/vote/vote.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { StorageModule } from 'src/storage/storage.module';
     UserModule,
     ArtistModule,
     StorageModule,
+    VoteModule,
   ],
   controllers: [CommunityController],
   providers: [CommunityService],

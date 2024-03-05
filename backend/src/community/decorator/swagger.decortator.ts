@@ -10,9 +10,11 @@ import {
 import { DetailFeedDto, FeedsDto } from '../dto/get-feed.dto';
 import {
   CreateCommentDto,
+  CreateCommentResponseDto,
   DeleteCommentResponseDto,
 } from '../dto/create-comment.dto';
 import { CommentDto } from '../dto/comment.dto';
+import { CreateFeedResponseDto } from '../dto/create-feed.dto';
 
 export const ApiGetFeed = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -51,6 +53,7 @@ export const ApiCreateFeed = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 피드를 생성했을 때의 응답',
+      type: CreateFeedResponseDto,
     })(target, key, descriptor);
 
     ApiResponse({
@@ -188,7 +191,7 @@ export const ApiCreateComment = () => {
     ApiResponse({
       status: 200,
       description: '성공적으로 댓글을 생성했을 때의 응답',
-      type: CreateCommentDto,
+      type: CreateCommentResponseDto,
     })(target, key, descriptor);
 
     ApiResponse({
