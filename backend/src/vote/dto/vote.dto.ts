@@ -4,10 +4,20 @@ import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 export class VoteInfo {
   @ApiProperty({
     example: 3,
-    description: '투표권 사용 개수',
+    description: '투표권 사용(지급) 개수',
   })
   @IsInt()
   voteCount: number;
+}
+
+export class GiveVoteInfo extends VoteInfo {
+  @ApiProperty({
+    example: 1,
+    description:
+      '투표권 지급 타입(0: 투표하기, 1: 출석체크, 2: 최애 일정 확인, 3: 커뮤니티 댓글 쓰기, 4: 커뮤니티 글쓰기)',
+  })
+  @IsInt()
+  type: number;
 }
 
 export class VoteResultDto {

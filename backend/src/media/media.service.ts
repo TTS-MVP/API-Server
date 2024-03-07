@@ -65,7 +65,7 @@ export class MediaService {
     const userProfile = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userProfile?.favoriteArtistId;
     if (!favoriteArtistId) {
-      throw new GlobalException(500, '최애 아티스트가 등록되지 않았습니다.');
+      throw new GlobalException('최애 아티스트가 등록되지 않았습니다.', 500);
     }
 
     // 아티스트 유튜브 id 조회

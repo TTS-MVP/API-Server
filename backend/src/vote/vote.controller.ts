@@ -13,13 +13,14 @@ import {
   ApiGetMonthlyArtistVotes,
   ApiGetMonthlyArtistVotesSummary,
   ApiGetMonthlyFanVotes,
+  ApiGiveVote,
   ApiVoteArtist,
 } from './decorator/swagger.decorator';
 import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { MonthlyArtistVoteView } from './entity/monthly-artist-vote.view';
 import { MonthlyFanVoteDto } from './dto/monthly-fan-vote.dto';
-import { VoteInfo, VoteResultDto } from './dto/vote.dto';
+import { GiveVoteInfo, VoteInfo, VoteResultDto } from './dto/vote.dto';
 
 @ApiTags('투표')
 @UseGuards(AuthGuard)
@@ -87,5 +88,19 @@ export class VoteController {
     const { voteCount } = voteInfo;
     const result = await this.voteService.voteArtist(userId, Number(voteCount));
     return new ResponseDto(true, 200, '아티스트 투표 성공', result);
+  }
+
+  // 투표권 지급
+  @ApiGiveVote()
+  @Post('give-vote')
+  async giveVote(@Body() voteInfo: GiveVoteInfo, @Req() request) {
+    const userId = request['userInfo'].userId;
+    const { voteCount, type } = voteInfo;
+    await this.voteService.recordedVoteAcquisitionHistory(
+      userId,
+      Number(voteCount),
+      Number(type),
+    );
+    return new ResponseDto(true, 200, '투표권 지급 성공');
   }
 }

@@ -84,6 +84,31 @@ export const ApiGetMonthlyArtistVotes = () => {
   };
 };
 
+export const ApiGiveVote = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '투표권 지급',
+      description: `
+      투표권을 지급한다.
+
+      파라미터 설명:
+      >> voteCount는 지급할 투표권 개수이다.
+      >> type은 투표권 지급 타입이다. (0: 투표하기, 1: 출석체크, 2: 최애 일정 확인, 3: 커뮤니티 댓글 쓰기, 4: 커뮤니티 글쓰기)
+      `,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '성공적으로 투표권을 지급했을 때의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 400,
+      description: '투표권을 지급하는데 실패했을 때의 응답',
+    })(target, key, descriptor);
+  };
+};
+
 export const ApiVoteArtist = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     ApiOperation({
