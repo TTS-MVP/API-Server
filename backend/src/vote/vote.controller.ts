@@ -93,14 +93,17 @@ export class VoteController {
   // 투표권 지급
   @ApiGiveVote()
   @Post('give-vote')
-  async giveVote(@Body() voteInfo: GiveVoteInfo, @Req() request) {
+  async giveVote(
+    @Body() voteInfo: GiveVoteInfo,
+    @Req() request,
+  ): Promise<ResponseDto<VoteInfo>> {
     const userId = request['userInfo'].userId;
     const { voteCount, type } = voteInfo;
-    await this.voteService.recordedVoteAcquisitionHistory(
+    const result = await this.voteService.recordedVoteAcquisitionHistory(
       userId,
       Number(voteCount),
       Number(type),
     );
-    return new ResponseDto(true, 200, '투표권 지급 성공');
+    return new ResponseDto(true, 200, '투표권 지급 성공', result);
   }
 }

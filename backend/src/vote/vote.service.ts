@@ -9,7 +9,11 @@ import { MonthlyFanVoteDto } from './dto/monthly-fan-vote.dto';
 import { MonthlyArtistVoteDto } from './dto/monthly-artist-vote.dto';
 import { UserVoteCountView } from './entity/vote-count.view';
 import { VoteEntity } from './entity/vote.entity';
-import { MonthlyArtistSummaryDto, VoteResultDto } from './dto/vote.dto';
+import {
+  MonthlyArtistSummaryDto,
+  VoteInfo,
+  VoteResultDto,
+} from './dto/vote.dto';
 import { ArtistService } from 'src/artist/artist.service';
 import { plainToInstance } from 'class-transformer';
 import { VoteAcquisitionHistoryEntity } from './entity/vote-acquisition-history.entity';
@@ -259,13 +263,16 @@ export class VoteService {
     userId: number,
     voteCount: number,
     type: number,
-  ) {
+  ): Promise<VoteInfo> {
     try {
       await this.voteAcquisitionHistoryRepository.save({
         userId,
         voteCount,
         type,
       });
+      // 투표권 개수 조회
+      const result = await this.getUserVoteById(userId);
+      return { voteCount: result };
     } catch (error) {
       throw new GlobalException(
         '투표권 획득 히스토리 기록에 실패했습니다.',
