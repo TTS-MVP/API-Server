@@ -61,7 +61,7 @@ export class UserService {
       await this.updateUserProfile(userProfile);
     }
   }
-  async login(socialLoginType: number, kakaoAccessToken: string) {
+  async login(socialLoginType: number, oauthAccessToken: string) {
     let userId;
     let socialData;
     let accessToken, refreshToken;
@@ -70,7 +70,7 @@ export class UserService {
       case 0: // 카카오
         socialData =
           await this.authKakaoService.getKakaoUserIdByKakaoAccessToken(
-            kakaoAccessToken,
+            oauthAccessToken,
           ); // 카카오 액세스 토큰 확인
         userId = socialData.id;
         break;
