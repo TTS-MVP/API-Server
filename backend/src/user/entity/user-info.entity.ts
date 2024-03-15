@@ -1,9 +1,18 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('user_info', { database: 'tniverse' })
 export class UserInfoEntity extends BaseEntity {
-  @PrimaryColumn({ type: 'int', unsigned: true, unique: false })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
+
+  @Column('varchar', { length: 64, name: 'external_id' })
+  externalId: string;
 
   @Column('tinyint', {
     name: 'login_type',
@@ -20,9 +29,12 @@ export class UserInfoEntity extends BaseEntity {
   })
   status: number;
 
-  @Column('text', { name: 'refresh_token' })
-  refreshToken: string;
+  @Column('text', { name: 'refresh_token', nullable: true })
+  refreshToken?: string;
 
   @Column('text', { name: 'email', nullable: true })
   email: string | null;
+
+  @Column('int', { name: 'birth_year', unsigned: true, nullable: true })
+  birthYear?: number;
 }

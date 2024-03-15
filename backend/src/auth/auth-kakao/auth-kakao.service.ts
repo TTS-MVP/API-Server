@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
-import { UserInfoEntity } from 'src/user/entity/user-info.entity';
 
 @Injectable()
 export class AuthKakaoService {
@@ -27,12 +26,14 @@ export class AuthKakaoService {
     }
     const { nickname, thumbnail_image_url } =
       kakaoUserInfo.kakao_account.profile;
-
+    console.log(kakaoUserInfo);
+    const { birthyear } = kakaoUserInfo.kakao_account;
     return {
       id,
       nickname,
       email,
       thumbnailUrl: thumbnail_image_url,
+      birthyear,
     };
   }
 }

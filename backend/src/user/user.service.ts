@@ -1,5 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { AuthKakaoService } from 'src/auth/auth-kakao/auth-kakao.service';
+import { AuthNaverService } from 'src/auth/auth-naver/auth-naver.service';
 import { AuthService } from 'src/auth/auth.service';
 import { GlobalException, ResponseDto } from 'src/common/dto/response.dto';
 import { Repository } from 'typeorm';
@@ -15,6 +16,7 @@ import { StorageService } from 'src/storage/storage.service';
 export class UserService {
   constructor(
     private readonly authKakaoService: AuthKakaoService,
+    private readonly authNaverService: AuthNaverService,
     private readonly authService: AuthService,
     private readonly storageService: StorageService,
     private readonly artistService: ArtistService,
@@ -63,6 +65,7 @@ export class UserService {
   }
   async login(socialLoginType: number, oauthAccessToken: string) {
     let userId;
+    let externalId;
     let socialData;
     let accessToken, refreshToken;
     let userProfileData;
@@ -72,9 +75,14 @@ export class UserService {
           await this.authKakaoService.getKakaoUserIdByKakaoAccessToken(
             oauthAccessToken,
           ); // 카카오 액세스 토큰 확인
-        userId = socialData.id;
+        externalId = socialData.id;
         break;
       case 1: // 네이버
+        socialData =
+          await this.authNaverService.getNaverUserIdByNaverAccessToken(
+            oauthAccessToken,
+          );
+        externalId = socialData.id;
         break;
       default:
         return new ResponseDto(
@@ -83,13 +91,7 @@ export class UserService {
           '유효하지 않은 소셜 로그인 타입입니다.',
         );
     }
-    const isExistUser = await this.getUserInfoByUserId(userId); // 소셜 아이디로 유저 조회
-
-    // 액세스, 리프레시 토큰 발급
-    [accessToken, refreshToken] = await Promise.all([
-      this.authService.createAccessToken(userId),
-      this.authService.createRefreshToken(userId),
-    ]);
+    const isExistUser = await this.getUserInfoByUserExternalId(externalId); // 소셜 아이디로 유저 조회
 
     // 유저가 존재하지 않으면 회원가입
     if (!isExistUser) {
@@ -101,30 +103,45 @@ export class UserService {
           ); // 카카오 사용자 정보 포맷
           break;
         case 1: // 네이버
+          formattedSocialData = await this.authNaverService.formatNaverUserInfo(
+            socialData,
+          );
           break;
       }
+      console.log(formattedSocialData);
       const userInfo = {
-        id: userId,
+        externalId,
         loginType: socialLoginType,
         status: 1,
-        refreshToken: refreshToken,
         email: formattedSocialData.email,
+        birthYear: formattedSocialData.birthyear,
       };
+      await this.userInfoRepository.save(userInfo);
+      userId = (await this.getUserInfoByUserExternalId(externalId)).id;
       const userProfile = {
         id: userId,
         nickName: formattedSocialData.nickname,
         thumbnailUrl: formattedSocialData.thumbnailUrl,
       };
-      await this.userInfoRepository.save(userInfo);
       userProfileData = await this.userProfileRepository.save(userProfile);
-    }
-    // 유저가 존재하면 로그인
-    else {
+      refreshToken = await this.authService.createRefreshToken(userId);
       await this.userInfoRepository.update(
         { id: userId },
         { refreshToken: refreshToken },
       );
     }
+    // 유저가 존재하면 로그인
+    else {
+      refreshToken = await this.authService.createRefreshToken(isExistUser.id);
+      await this.userInfoRepository.update(
+        { id: isExistUser.id },
+        { refreshToken: refreshToken },
+      );
+    }
+
+    // 액세스, 리프레시 토큰 발급
+    accessToken = await this.authService.createAccessToken(userId);
+
     return {
       isExistUser: isExistUser ? true : false,
       // userProfileData에서 createdAt, updatedAt, registedAt 제거
@@ -140,6 +157,13 @@ export class UserService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async getUserInfoByUserExternalId(externalId: string) {
+    const userData = await this.userInfoRepository.findOne({
+      where: { externalId: externalId },
+    });
+    return userData;
   }
 
   async getUserInfoByUserId(userId: number) {
