@@ -108,7 +108,7 @@ export class UserService {
           );
           break;
       }
-      console.log(formattedSocialData);
+
       const userInfo = {
         externalId,
         loginType: socialLoginType,
@@ -124,6 +124,7 @@ export class UserService {
         thumbnailUrl: formattedSocialData.thumbnailUrl,
       };
       userProfileData = await this.userProfileRepository.save(userProfile);
+      accessToken = await this.authService.createAccessToken(userId);
       refreshToken = await this.authService.createRefreshToken(userId);
       await this.userInfoRepository.update(
         { id: userId },
@@ -132,15 +133,13 @@ export class UserService {
     }
     // 유저가 존재하면 로그인
     else {
+      accessToken = await this.authService.createAccessToken(isExistUser.id);
       refreshToken = await this.authService.createRefreshToken(isExistUser.id);
       await this.userInfoRepository.update(
         { id: isExistUser.id },
         { refreshToken: refreshToken },
       );
     }
-
-    // 액세스, 리프레시 토큰 발급
-    accessToken = await this.authService.createAccessToken(userId);
 
     return {
       isExistUser: isExistUser ? true : false,
