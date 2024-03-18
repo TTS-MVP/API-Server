@@ -5,11 +5,30 @@ import {
 } from '../dto/login-user.dto';
 import { UserProfileDTO } from '../dto/profile.dto';
 
+export const ApiCheckToken = () => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    ApiOperation({
+      summary: '서비스 토큰 검증',
+      description: `토큰을 검증한다.`,
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 200,
+      description: '서비스 토큰 검증 성공 시의 응답',
+    })(target, key, descriptor);
+
+    ApiResponse({
+      status: 401,
+      description: '서비스 토큰이 만료되었습니다.',
+    })(target, key, descriptor);
+  };
+};
+
 export const ApiLogin = () => {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     ApiOperation({
-      summary: '소셜 로그인 토큰 검증',
-      description: `소셜 로그인 토큰을 검증한다. 검증에 성공하면 트니버스 서비스 토큰을 발급한다.  
+      summary: '소셜 로그인 토큰 발급',
+      description: `소셜 로그인 토큰을 발급한다. oauth 토큰 검증에 성공하면 트니버스 서비스 토큰을 발급한다.  
         
       body 값으로 loginType과 accessToken을 받는다.  
       loginType은 0: 카카오, 1: 네이버이다.  

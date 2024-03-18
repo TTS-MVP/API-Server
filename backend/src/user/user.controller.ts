@@ -12,18 +12,20 @@ import {
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+  ApiCheckToken,
   ApiLogin,
   ApiProfile,
   ApiRegister,
 } from './decorator/swagger.decorator';
 import { SocialLoginTypeDto } from 'src/auth/dto/auth.dto';
 import { ResponseDto } from 'src/common/dto/response.dto';
-import { UserProfileDTO } from './dto/profile.dto';
 import { AuthGuard } from 'src/auth/auth-guard.service';
 import { VoteService } from 'src/vote/vote.service';
 import { ApiVote } from 'src/vote/decorator/swagger.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CheckTokenDTO } from './dto/jwt.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('유저')
 @Controller('user')
@@ -31,7 +33,16 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly voteService: VoteService,
+    private readonly authService: AuthService,
   ) {}
+
+  @ApiCheckToken()
+  @Post('check-token')
+  async checkToken(@Body() checkTokenDTO: CheckTokenDTO) {
+    const { accessToken } = checkTokenDTO;
+    this.authService.verify(accessToken);
+    return new ResponseDto(true, 200, '토큰 검증 성공');
+  }
 
   @ApiLogin()
   @Post('login')
