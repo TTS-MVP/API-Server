@@ -40,8 +40,8 @@ export class UserController {
   @Post('check-token')
   async checkToken(@Body() checkTokenDTO: CheckTokenDTO) {
     const { accessToken } = checkTokenDTO;
-    this.authService.verify(accessToken);
-    return new ResponseDto(true, 200, '토큰 검증 성공');
+    const result = this.authService.verifyBoolean(accessToken);
+    return new ResponseDto(true, 200, '토큰 검증 성공', { result });
   }
 
   @ApiLogin()

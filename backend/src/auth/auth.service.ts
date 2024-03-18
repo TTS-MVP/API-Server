@@ -46,4 +46,13 @@ export class AuthService {
       throw new UnauthorizedException();
     }
   }
+
+  verifyBoolean(token: string) {
+    try {
+      jwt.verify(token, this.configService.get('JWT_SECRET'));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
