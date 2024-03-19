@@ -234,9 +234,10 @@ export class UserService {
       userProfile: {
         ...userProfileData,
         voteCount,
-        registedAt: Math.floor(
-          (Date.now() - userProfileData.registedAt.getTime()) / 86400000,
-        ),
+        registedAt:
+          Math.floor(
+            (Date.now() - userProfileData.registedAt.getTime()) / 86400000,
+          ) + 1,
         contribution: fanContribution,
         rank: rank,
         artistRank: artistRank,
