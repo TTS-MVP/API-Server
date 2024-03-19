@@ -14,7 +14,7 @@ export class MediaController {
   @ApiGetMedia()
   @Get()
   async getMedia(@Req() request): Promise<ResponseDto<VideoItemDTO[]>> {
-    const userId = request['userInfo']?.userId;
+    const userId = request['userInfo'].userId;
     if (!userId) throw new GlobalException('유저 정보가 없습니다.', 400);
     const medias = await this.mediaService.getMedia(userId);
     return new ResponseDto(true, 200, '미디어 조회 성공', medias);
