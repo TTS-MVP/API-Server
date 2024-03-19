@@ -227,6 +227,7 @@ export class CommunityService {
       let isClearMission = false;
       if ((await this.getFeedCountByUser(userId)) <= 3) {
         await this.voteService.recordedVoteAcquisitionHistory(userId, 10, 4);
+        console.log('지급 완료 글쓰기');
         isClearMission = true;
       }
       return { isClearMission };
@@ -310,6 +311,7 @@ export class CommunityService {
       let isClearMission = false;
       if ((await this.getCommentCountByUser(userId)) <= 5) {
         await this.voteService.recordedVoteAcquisitionHistory(userId, 1, 3);
+        console.log('지급 완료 댓글쓰기');
         isClearMission = true;
       }
       const transformedComment = plainToInstance(CommentDto, comment);
