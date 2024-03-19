@@ -7,6 +7,8 @@ import { ApiGetMedia } from './decorator/swagger.decorator';
 import { VideoItemDTO } from './dto/media.dto';
 
 @ApiTags('미디어')
+@UseGuards(AuthGuard)
+@ApiBearerAuth('accessToken')
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
