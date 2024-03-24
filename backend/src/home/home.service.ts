@@ -19,7 +19,7 @@ export class HomeService {
     const result = {
       votes: await this.voteService.getMonthlyArtistVotesSummary(userId),
       schedules: await this.scheduleService.getRecentSchedules(userId),
-      communities: await this.communityService.getHotFeeds(),
+      communities: await this.communityService.getHotFeeds(userId),
       medias: medias.map((media) => plainToInstance(SummaryVideoDTO, media)),
     };
     return result;

@@ -33,10 +33,17 @@ export class CommunityService {
     private readonly voteService: VoteService,
   ) {}
 
-  async getHotFeeds(): Promise<summaryFeedDto[]> {
+  async getHotFeeds(userId: number): Promise<summaryFeedDto[]> {
+    const userProfile = await this.userService.getUserProfileByUserId(userId);
+    const favoriteArtistId = userProfile?.favoriteArtistId;
+    if (!favoriteArtistId)
+      throw new GlobalException('최애 아티스트가 존재하지 않습니다.', 400);
     const feedQueryBuilder = await this.feedRepository
       .createQueryBuilder('feed')
       .where('feed.status = :status', { status: 1 })
+      .andWhere('feed.favoriteArtistId = :favoriteArtistId', {
+        favoriteArtistId,
+      })
       .andWhere('feed.thumbnailUrl IS NOT NULL')
       .orderBy('feed.likeCount', 'DESC')
       .limit(5);
