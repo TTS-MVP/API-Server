@@ -21,22 +21,4 @@ export class MediaController {
     const medias = await this.mediaService.getMedia(userId);
     return new ResponseDto(true, 200, '미디어 조회 성공', medias);
   }
-
-  @Post('test')
-  async test(@Req() request) {
-    console.log(request.body);
-    const responseBody = {
-      version: '2.0',
-      template: {
-        outputs: [
-          {
-            simpleText: {
-              text: "hello I'm Ryan",
-            },
-          },
-        ],
-      },
-    };
-    return responseBody;
-  }
 }

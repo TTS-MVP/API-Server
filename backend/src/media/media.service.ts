@@ -15,9 +15,10 @@ export class MediaService {
   ) {}
 
   private async getArtistYoutubeMedias(
-    channelId: string,
+    channelId?: string,
+    query: string = '',
     maxResults: number = 50,
-    order: 'date' | 'viewCount' = 'date',
+    order: 'date' | 'viewCount' | 'relevance' = 'date',
   ) {
     const mediaItems = [];
     const mediaItemsUrl = `https://www.googleapis.com/youtube/v3/search`;
@@ -29,7 +30,7 @@ export class MediaService {
       maxResults,
       order: order,
       type: 'video',
-      q: '',
+      q: query,
     };
 
     try {
@@ -62,6 +63,7 @@ export class MediaService {
     limit: number = 20,
   ): Promise<VideoItemDTO[]> {
     // 유저 최애 아티스트 조회
+    let searchKeyword;
     const userProfile = await this.userService.getUserProfileByUserId(userId);
     const favoriteArtistId = userProfile?.favoriteArtistId;
     if (!favoriteArtistId) {
@@ -72,16 +74,21 @@ export class MediaService {
     const artistInfo = await this.artistService.getArtistById(favoriteArtistId);
     const artistYoutubeId = artistInfo?.youtubeChannelId;
     if (!artistYoutubeId) {
-      return [];
+      // 유튜브 채널 ID가 없을 경우 아티스트 이름으로 영상 검색
+      searchKeyword = artistInfo.name + ' 트로트 가수 유튜브';
+      return await this.getArtistYoutubeMedias(
+        artistYoutubeId,
+        searchKeyword,
+        limit,
+        'relevance',
+      );
+    } else {
+      return await this.getArtistYoutubeMedias(
+        artistYoutubeId,
+        searchKeyword,
+        limit,
+        order,
+      );
     }
-
-    // 유튜브 채널 ID로 업로드 영상 조회
-    const result = await this.getArtistYoutubeMedias(
-      artistYoutubeId,
-      limit,
-      order,
-    );
-
-    return result;
   }
 }
