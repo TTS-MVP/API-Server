@@ -48,10 +48,12 @@ export class MediaService {
           url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
           views: 0,
         };
+        console.log(data);
         mediaItems.push(data);
       });
     } catch (error) {
-      throw new GlobalException('유튜브 API 호출에 실패했습니다.', 500);
+      return [];
+      //throw new GlobalException('유튜브 API 호출에 실패했습니다.', 500);
     }
 
     return mediaItems;
