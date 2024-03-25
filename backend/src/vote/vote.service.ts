@@ -144,7 +144,7 @@ export class VoteService {
     if (fanVoteCount > artistVoteCount) return 100;
 
     const contribution = 100 - (fanVoteCount / artistVoteCount) * 100;
-    return contribution;
+    return Math.round(contribution * 10) / 10;
   }
 
   async getUserVoteById(userId: number): Promise<number> {
