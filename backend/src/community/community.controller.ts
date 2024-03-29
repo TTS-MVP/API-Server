@@ -88,7 +88,6 @@ export class CommunityController {
   ) {
     const userId = request['userInfo'].userId;
     if (!userId) throw new Error('유저 정보가 없습니다.');
-    console.log(userId);
     const feed = await this.communityService.updateFeed(
       feedId,
       userId,

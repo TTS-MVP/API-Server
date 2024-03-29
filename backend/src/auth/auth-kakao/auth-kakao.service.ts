@@ -26,7 +26,6 @@ export class AuthKakaoService {
     }
     const { nickname, thumbnail_image_url } =
       kakaoUserInfo.kakao_account.profile;
-    console.log(kakaoUserInfo);
     const { birthyear } = kakaoUserInfo.kakao_account;
     return {
       id,

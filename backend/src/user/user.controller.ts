@@ -50,6 +50,7 @@ export class UserController {
   async login(@Body() socialLoginTypeDto: SocialLoginTypeDto) {
     const { loginType: socialLoginType, accessToken } = socialLoginTypeDto;
     const data = await this.userService.login(socialLoginType, accessToken);
+    console.log(data);
     let message, statusCode;
     if (data['isExistUser'] === false) {
       message = '유저 정보 조회 성공';
