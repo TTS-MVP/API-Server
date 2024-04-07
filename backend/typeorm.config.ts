@@ -22,7 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity{.ts,.js}', 'dist/**/*.view{.ts,.js}'],
-      synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
+      synchronize: false,
       charset: 'utf8mb4',
     };
   }
